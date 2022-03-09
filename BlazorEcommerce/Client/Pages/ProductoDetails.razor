@@ -1,0 +1,48 @@
+﻿@page "/producto/{id:int}"
+@inject IProductoService ProductoService
+
+@if (producto == null)
+{
+    <span>@mensaxe</span>
+}
+else
+{
+    <div class="media">
+        <div class="media-img-wrapper mr-2">
+            <img class="media-img" src="@producto.ImaxeUrl" alt="@producto.Titulo" />
+        </div>
+        <div class="media-body">
+            <h2 class="mb-0">@producto.Titulo</h2>
+            <p>@producto.Descripcion</p>
+            <h4 class="price">
+                @producto.Precio€
+            </h4>
+        </div>
+    </div>
+}
+
+@code {
+    private Producto? producto = null;
+    private string mensaxe = string.Empty; //damos valor string.Empty por se o string e null
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //producto = ProductoService.Productos.Find(p => p.Id == Id); //atopamos os productos onde a Id coincida cunha Id dada.
+        //Isto so funciona cando cargamos os productos antes de acceder aos detalles do producto
+        //Pero se usamos a url coa id directamente ou recargamos a paxina, non funcionara
+        mensaxe = "Cargando productos...";
+
+        var resultado = await ProductoService.GetProducto(Id);
+        if (!resultado.Exito)
+        {
+            mensaxe = resultado.Mensaxe;
+        }
+        else
+        {
+            producto = resultado.Data;
+        }
+    }
+}

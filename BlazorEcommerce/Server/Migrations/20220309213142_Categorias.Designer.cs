@@ -3,6 +3,7 @@ using BlazorEcommerce.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorEcommerce.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220309213142_Categorias")]
+    partial class Categorias
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,78 +123,6 @@ namespace BlazorEcommerce.Server.Migrations
                             ImaxeUrl = "https://upload.wikimedia.org/wikipedia/commons/c/c3/1984first.jpg",
                             Precio = 11.99m,
                             Titulo = "Nineteen Eighty-Four"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CategoriaId = 2,
-                            Descripcion = "Matrix (en inglés: The Matrix) é un filme de ciencia ficción escrito e dirixido por Lana e Lilly Wachowski e protagonizado por Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss e Hugo Weaving. Foi estreado nos Estados Unidos o 31 de marzo de 1999 e foi o primeiro da triloxía de Matrix e dunha serie de videoxogos, curtas animadas e bandas deseñadas. O filme gañou 4 Premios Oscar incluíndo a mellor montaxe, mellor son, mellor edición de son e mellores efectos visuais.",
-                            ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/c/c1/The_Matrix_Poster.jpg",
-                            Precio = 4.99m,
-                            Titulo = "The Matrix"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CategoriaId = 2,
-                            Descripcion = "Back to the Future é un filme estadounidense dirixido por Robert Zemeckis que foi estreado en 1985. Escrito por Zemeckis e Bob Gale, producido por Steven Spielberg, e protagonizado por Michael J. Fox, Christopher Lloyd, Lea Thompson, Crispin Glover e Thomas F. Wilson.",
-                            ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/d/d2/Back_to_the_Future.jpg",
-                            Precio = 3.99m,
-                            Titulo = "Back to the Future"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CategoriaId = 2,
-                            Descripcion = "Toy Story (en galego, Historia de xoguetes) é unha película de animación xerada por computadora de Pixar e Walt Disney Pictures. Estreouse nos Estados Unidos o 22 de novembro de 1995. Foi a primeira longametraxe totalmente animada por computadora e o primeiro proxecto importante de Pixar no cine.",
-                            ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/1/13/Toy_Story.jpg",
-                            Precio = 2.99m,
-                            Titulo = "Toy Story"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CategoriaId = 3,
-                            Descripcion = "Half-Life 2 (HL2) é a secuela do videoxogo Half-Life, unha aventura de videoxogos en primeira persoa. Anteriormente, o videoxogo vendíase xunto con Counter-Strike: Source, a secuela de Counter-Strike co novo motor gráfico e o motor físico (Havok) implementados e os niveis totalmente redeseñados. Actualmente pódese adquirir a través do paquete The Orange Box, que inclúe o xogo e as súas respectivas secuelas (Episode One e Episode Two) e tamén inclúe Team Fortress 2 e Portal, tamén feitos por Valve. Foi publicado o 16 de novembro de 2004, aínda que xa se podía descargar semanas antes a través de Steam. Foi galardoado como o xogo da década no décimo aniversario dos premios VGA.",
-                            ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/2/25/Half-Life_2_cover.jpg",
-                            Precio = 49.99m,
-                            Titulo = "Half-Life 2"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CategoriaId = 3,
-                            Descripcion = "Diablo II é un xogo de role-playing Hack-And-Slash Publicado por Blizzard Entertainment en 2000 para Microsoft Windows, Classic Mac OS e MacOS.",
-                            ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/d/d5/Diablo_II_Coverart.png",
-                            Precio = 9.99m,
-                            Titulo = "Diablo II"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CategoriaId = 3,
-                            Descripcion = "Día do tentáculo, tamén coñecido como Maniac Mansion II: Day of the Tentacle, [2] [3] é un xogo de aventura gráfica de 1993 desenvolvido e publicado por LucasArts. É a secuela do xogo Maniac Game Mansion de 1987. A trama segue a Bernard Bernoulli e os seus amigos de Hoagie e Laverne, xa que intentan deter o malvado tentáculo púrpura, un tentáculo sentente, desembarkado, de asumir o mundo. O xogador controla o trío e resolve crebacabezas mentres usa o tempo de viaxe para explorar diferentes períodos de historia..",
-                            ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/7/79/Day_of_the_Tentacle_artwork.jpg",
-                            Precio = 14.99m,
-                            Titulo = "Day of the Tentacle"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CategoriaId = 3,
-                            Descripcion = "A Xbox é unha consola de videojuegos domésticos e a primeira entrega da serie Xbox de consolas de videojuegos fabricados por Microsoft.",
-                            ImaxeUrl = "https://upload.wikimedia.org/wikipedia/commons/4/43/Xbox-console.jpg",
-                            Precio = 159.99m,
-                            Titulo = "Xbox"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            CategoriaId = 3,
-                            Descripcion = "O Super Nintendo Entertainment System (SNES), tamén coñecido como Super Nes ou Super Nintendo, é unha consola de videojuegos domésticos de 16 bits desenvolvida por Nintendo que foi lanzada en 1990 en Xapón e Corea do Sur.",
-                            ImaxeUrl = "https://upload.wikimedia.org/wikipedia/commons/e/ee/Nintendo-Super-Famicom-Set-FL.jpg",
-                            Precio = 79.99m,
-                            Titulo = "Super Nintendo Entertainment System"
                         });
                 });
 

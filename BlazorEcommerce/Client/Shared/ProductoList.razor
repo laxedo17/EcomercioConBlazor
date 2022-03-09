@@ -1,38 +1,53 @@
 ﻿@using BlazorEcommerce.Shared
-@inject HttpClient Http
+@inject IProductoService ProductoService
 
-<ul class="list-unstyled">
-    @foreach (var producto in Productos)
-    {
-        <li class="media my-3">
-            <div class="media-img-wrapper mr-2">
-                <a href="#">
-                    <img class="media-img" src="@producto.ImaxeUrl" alt="@producto.Titulo" />
-                </a>
-            </div>
-            <div class="media-body">
-                <a href="#">
-                    <h4 class="mb-0">@producto.Titulo</h4>
-                </a>
-                <p>@producto.Descripcion</p>
-                <h5 class="price">
-                    @producto.Precio€
-                </h5>
-            </div>
-        </li>
-    }
-</ul>
+@if(ProductoService.Productos == null || ProductoService.Productos.Count == 0)
+{
+    <span>Cargando Productos...</span>
+}
+else 
+{
+    <ul class="list-unstyled">
+        @foreach (var producto in ProductoService.Productos)
+        {
+            <li class="media my-3">
+                <div class="media-img-wrapper mr-2">
+                    <a href="/producto/@producto.Id">
+                        <img class="media-img" src="@producto.ImaxeUrl" alt="@producto.Titulo" />
+                    </a>
+                </div>
+                <div class="media-body">
+                    <a href="/producto/@producto.Id">
+                        <h4 class="mb-0">@producto.Titulo</h4>
+                    </a>
+                    <p>@producto.Descripcion</p>
+                    <h5 class="price">
+                        @producto.Precio€
+                    </h5>
+                </div>
+            </li>
+        }
+    </ul>
+}
+
 
 @code {
-    private static List<Producto> Productos = new List<Producto>(); //deixamos a lista so inicializada, pero sen mais datos, xa que agora temos os datos nunha web API e chamaremola desde o cliente
+    //Productos comentado porque agora con ProductoService xa non necesitamos crear esta lista
+    //private static List<Producto> Productos = new List<Producto>(); //deixamos a lista so inicializada, pero sen mais datos, xa que agora temos os datos nunha web API e chamaremola desde o cliente
 
     protected override async Task OnInitializedAsync()
     {        
-        var resultado = await Http.GetFromJsonAsync<List<Producto>>("api/Producto");
-        if(resultado != null)
-        {
-            Productos = resultado;
-        }
+        //var resultado = await Http.GetFromJsonAsync<List<Producto>>("api/producto");
+        //novo cambio, para simplificar, retirado HttpClient, co cal comentamos as linhas seguintes para deixar de usar HttpClient e utilizar IProductoService
+        //var resultado = 
+            //await Http.GetFromJsonAsync<ServiceResposta<List<Producto>>>("api/producto"); // Paso 22, modificado aqui tamen porque usamos o servicio creado en proxecto Shared
+        //if(resultado != null && resultado.Data != null)
+        //{
+            //Productos = resultado.Data;
+        //}
+
+        //agora teremos todo nunha unica linha
+        await ProductoService.GetProductos(); 
     }
 
     //{
