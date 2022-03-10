@@ -10,20 +10,35 @@
         }
         public List<Producto> Productos { get; set; } = new List<Producto>();
 
+        public event Action ProductosCambiaron;
+
         public async Task<ServiceResposta<Producto>> GetProducto(int productoId)
         {
             var resultado = await _http.GetFromJsonAsync<ServiceResposta<Producto>>($"api/producto/{productoId}");
             return resultado;
         }
 
-        public async Task GetProductos()
+        // public async Task GetProductos()
+        // {
+        //     var resultado = await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>("api/producto");
+        //     if (resultado != null && resultado.Data != null)
+        //     {
+        //         Productos = resultado.Data;
+        //     }
+        // }
+
+        public async Task GetProductos(string? categoriaUrl = null)
         {
-            var resultado = await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>("api/producto");
+            //Usamos o coalescing operator
+            var resultado = categoriaUrl == null ?
+            await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>("api/producto") :
+            await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>($"api/producto/categoria/{categoriaUrl}"); //ponhemos caracter $ para poder agregar variables literales
             if (resultado != null && resultado.Data != null)
             {
                 Productos = resultado.Data;
             }
 
+            ProductosCambiaron.Invoke(); //cada componente suscrito a este evento fara o que lle indiquemos. Hai que suscribir algun componente a este evento para que non de unha excepcion, por exemplo no component ProductoList.razor
         }
     }
 }

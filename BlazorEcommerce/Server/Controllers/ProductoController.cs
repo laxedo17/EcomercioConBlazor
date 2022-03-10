@@ -46,6 +46,12 @@ namespace BlazorEcommerce.Server.Controllers
             return Ok(resposta); // e devolvemos o resultado
         }
 
+        [HttpGet("categoria/{categoriaUrl}")]
+        public async Task<ActionResult<ServiceResposta<List<Producto>>>> GetProductosPorCategoriaAsync(string categoriaUrl) // Paso 21, agregado o servicio creado no proxecto Shared para dar mais datos das operacions que facemos 
+        {
+            var resposta = await _productoService.GetProductosPorCategoriaAsync(categoriaUrl); //pasamos a peticion a traves do Servicio usando aqui _productoService
+            return Ok(resposta); // e devolvemos o resultado
+        }
 
         // public async Task<ActionResult<List<Producto>>> GetProducto()
         // {

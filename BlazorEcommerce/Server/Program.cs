@@ -3,6 +3,7 @@ global using Microsoft.EntityFrameworkCore;
 global using BlazorEcommerce.Server.Data;
 global using Microsoft.AspNetCore.ResponseCompression;
 global using BlazorEcommerce.Server.Services.ProductoService;
+global using BlazorEcommerce.Server.Services.CategoriaService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddEndpointsApiExplorer();//para engadir Swashbuckle (Swagger)
 builder.Services.AddSwaggerGen(); //sumamos Swagger
 
 builder.Services.AddScoped<IProductoService, ProductoService>();//tras usar Dependency Injection con IProductoService, queremos usar a clase ProductoService. Con Dependency Injection podemos facer probas con por exemplo unha clase ProductoService2 se queremos facer algún cambio e simplemente modificalo aquí nesta linha escribindo ProductoService2 en vez de ProductoService, é unha das ventaxas da Dependency Injection, tamen vale para facer Unit Testing moito mais facil
+builder.Services.AddScoped<ICategoriaService, CategoriaService>(); //igual que con IProductoService pero con CategoriaService
 
 var app = builder.Build();
 
