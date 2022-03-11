@@ -23,7 +23,8 @@ else
                     </a>
                     <p>@producto.Descripcion</p>
                     <h5 class="price">
-                        @producto.Precio€
+                        @* @producto.Precio€ *@
+                        @GetPrecioText(producto)
                     </h5>
                 </div>
             </li>
@@ -41,5 +42,22 @@ else
     public void Dispose()
     {
         ProductoService.ProductosCambiaron -= StateHasChanged;
+    }
+
+    private string GetPrecioText(Producto producto)
+    {
+        var variantes = producto.Variantes;
+        if (variantes.Count == 0)
+        {
+            return string.Empty;
+        }
+        else if (variantes.Count == 1)
+        {
+            return $"{variantes[0].Precio}€";
+        }
+        decimal precioMinimo = variantes.Min(v => v.Precio);
+        return $"Comenzando en {precioMinimo}€";
+        //Unicamente os productos con mais dunha variante (ex. libro publicado en papel, ou e-book, etc) mostran o texto
+        //"Comenzando en..."
     }
 }

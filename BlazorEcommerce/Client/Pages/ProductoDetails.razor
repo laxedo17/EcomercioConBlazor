@@ -14,9 +14,28 @@ else
         <div class="media-body">
             <h2 class="mb-0">@producto.Titulo</h2>
             <p>@producto.Descripcion</p>
-            <h4 class="price">
-                @producto.Precio€
-            </h4>
+            @if (producto.Variantes != null && producto.Variantes.Count > 1)
+            {
+                <div class="mb-3">
+                    <select class="form-select" @bind="actualTypeId">
+                        @foreach (var variante in producto.Variantes)
+                        {
+                            <option value="@variante.ProductoTypeId">@variante.ProductoType.Nome</option>
+                        }
+                    </select>
+                </div>
+            }
+            @if (GetVarianteSeleccionada() != null)
+            {
+                @if (GetVarianteSeleccionada().OrixinalPrecio > GetVarianteSeleccionada().Precio)
+                {
+                    <h6 class="text-muted precio-orixinal">@GetVarianteSeleccionada().OrixinalPrecio€</h6>
+                }
+                <h4 class="price">
+                    @* @producto.Precio€ *@
+                    @GetVarianteSeleccionada().Precio€
+                </h4>
+            }
         </div>
     </div>
 }
@@ -24,6 +43,11 @@ else
 @code {
     private Producto? producto = null;
     private string mensaxe = string.Empty; //damos valor string.Empty por se o string e null
+
+    //Inicializamos unha id de maneira que a primeira variante dun producto se mostre
+    //Daremos oportunidade a usuario de seleccionar un tipo de producto ou tipo de variante cunha caixa de seleccion
+    //pero inicialmente deixaremos isto nun valor por defecto
+    private int actualTypeId = 1;
 
     [Parameter]
     public int Id { get; set; }
@@ -33,6 +57,7 @@ else
         //producto = ProductoService.Productos.Find(p => p.Id == Id); //atopamos os productos onde a Id coincida cunha Id dada.
         //Isto so funciona cando cargamos os productos antes de acceder aos detalles do producto
         //Pero se usamos a url coa id directamente ou recargamos a paxina, non funcionara
+
         mensaxe = "Cargando productos...";
 
         var resultado = await ProductoService.GetProducto(Id);
@@ -43,6 +68,18 @@ else
         else
         {
             producto = resultado.Data;
+            if (producto.Variantes.Count > 0)
+            {
+                actualTypeId = producto.Variantes[0].ProductoTypeId;
+            }
         }
+    }
+
+    private ProductoVariante GetVarianteSeleccionada()
+    {
+        //primeiro elemente Where (expresion lambda =>, como en bases de datos) o productotypeid sexa igual a id do tipo de
+        //producto actualmente seleccionado
+        var variante = producto.Variantes.FirstOrDefault(v => v.ProductoTypeId == actualTypeId);
+        return variante;
     }
 }

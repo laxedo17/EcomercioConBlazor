@@ -11,6 +11,10 @@
     text-align: center;
 }
 
+.precio-orixinal {
+    text-decoration: line-through;
+}
+
 @media (max-width: 1023.98px) {
     .media {
         flex-direction: column;

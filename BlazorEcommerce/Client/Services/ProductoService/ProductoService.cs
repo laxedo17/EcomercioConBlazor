@@ -38,7 +38,7 @@
                 Productos = resultado.Data;
             }
 
-            ProductosCambiaron.Invoke(); //cada componente suscrito a este evento fara o que lle indiquemos. Hai que suscribir algun componente a este evento para que non de unha excepcion, por exemplo no component ProductoList.razor
+            ProductosCambiaron.Invoke(); //cada componente suscrito a este evento fara o que lle indiquemos. Hai que suscribir algun componente a este evento para que non de unha excepcion, por exemplo no component ProductoList.razor 
         }
     }
 }
