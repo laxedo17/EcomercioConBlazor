@@ -9,6 +9,9 @@
         //Creamos un evento porque cando cargamos o component da lista de productos non se lanza o metodo OnInitializedAsync(), asi que os productos non se actualizarian nin recargarian con posibles cambios porque a app non sabe que algo cambiou
         //Con este evento faremos uso do metodo do metodo de lifecycle OnParametersSet()
         event Action ProductosCambiaron; //imos a Index.razor para implementar OnParametersSetAsync e activar o evento e desde ali imos ao component ProductoList.razor do proxecto Client
+        string Mensaxe { get; set; } //para dar unha mensaxe que empezara no servicio para darlle informacion ao usuario nas busquedas solicitadas
+        Task SearchProductos(string busquedaText);
+        Task<List<string>> GetProductoSearchSuxerencias(string busquedaText);
     }
 
 }

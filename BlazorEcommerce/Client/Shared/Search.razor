@@ -1,0 +1,50 @@
+﻿@inject NavigationManager NavigationManager
+@inject IProductoService ProductoService
+
+<div class="input-group">
+    <input @bind-value="busquedaText" @bind-value:event="oninput" type="search" list="productos"
+        @onkeyup="ManexarSearch" class="form-control" placeholder="Buscar..." @ref="entradaBusqueda" />
+    <datalist id="productos">
+        @foreach (var suxerencia in suxerencias)
+        {
+            <option>@suxerencia</option>
+        }
+    </datalist>
+    <div class="input-group-append">
+        <button class="btn btn-primary" @onclick="SearchProductos">
+            <span class="oi oi-magnifying-glass"></span>
+        </button>
+    </div>
+</div>
+
+@code {
+    private string busquedaText = string.Empty;
+    private List<string> suxerencias = new List<string>();
+    protected ElementReference entradaBusqueda;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await entradaBusqueda.FocusAsync();
+        }
+    }
+
+    public void SearchProductos()
+    {
+        NavigationManager.NavigateTo($"search/{busquedaText}");
+    }
+
+    public async Task ManexarSearch(KeyboardEventArgs args)
+    {
+        //se @ usuari@ non busca nada ou presiona enter
+        if (args.Key == null || args.Key.Equals("Enter"))
+        {
+            SearchProductos();
+        }
+        else if (busquedaText.Length > 1)
+        {
+            suxerencias = await ProductoService.GetProductoSearchSuxerencias(busquedaText);
+        }
+    }
+}

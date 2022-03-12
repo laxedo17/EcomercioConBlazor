@@ -10,6 +10,7 @@
         }
         public List<Producto> Productos { get; set; } = new List<Producto>();
 
+        public string Mensaxe { get; set; } = "Cargando productos...";
         public event Action ProductosCambiaron;
 
         public async Task<ServiceResposta<Producto>> GetProducto(int productoId)
@@ -39,6 +40,27 @@
             }
 
             ProductosCambiaron.Invoke(); //cada componente suscrito a este evento fara o que lle indiquemos. Hai que suscribir algun componente a este evento para que non de unha excepcion, por exemplo no component ProductoList.razor 
+        }
+
+        public async Task<List<string>> GetProductoSearchSuxerencias(string busquedaText)
+        {
+            var resultado = await _http.GetFromJsonAsync<ServiceResposta<List<string>>>($"api/producto/searchsuggestions/{busquedaText}");
+            return resultado.Data;
+        }
+
+        public async Task SearchProductos(string busquedaText)
+        {
+            var resultado = await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>($"api/producto/search/{busquedaText}");
+            if (resultado != null && resultado.Data != null)
+            {
+                Productos = resultado.Data;
+            }
+
+            if (Productos.Count == 0)
+            {
+                Mensaxe = "Non se atoparon productos";
+            }
+            ProductosCambiaron?.Invoke();
         }
     }
 }
