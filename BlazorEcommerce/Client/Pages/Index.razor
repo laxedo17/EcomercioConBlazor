@@ -5,6 +5,14 @@
 
 <PageTitle>Miña boutique de libros con pedigri anti-pediguenhos</PageTitle>
 
+@if (BusquedaText == null && CategoriaUrl == null)
+{
+    <ProductosDestacados />
+}
+else
+{
+    <ProductoList />
+}
 <ProductoList />
 
 @code {

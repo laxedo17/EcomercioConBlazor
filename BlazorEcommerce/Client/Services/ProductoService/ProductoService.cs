@@ -32,7 +32,9 @@
         {
             //Usamos o coalescing operator
             var resultado = categoriaUrl == null ?
-            await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>("api/producto") :
+            //await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>("api/producto") :
+            //agora so mostraremos productos destacados
+            await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>("api/producto/destacado") :
             await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>($"api/producto/categoria/{categoriaUrl}"); //ponhemos caracter $ para poder agregar variables literales
             if (resultado != null && resultado.Data != null)
             {

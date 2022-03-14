@@ -65,7 +65,8 @@
                     CategoriaId = 1,
                     Titulo = "The Hitchhiker's Guide to the Galaxy",
                     Descripcion = "A Guía do Autoestopista Galáctico (título orixinal The Hitchhiker's Guide to the Galaxy) é unha serie de novelas humorísticas de ciencia ficción do escritor inglés Douglas Adams. Orixinalmente unha comedia radiofónica que comezou a emitirse na BBC en 1978, foi seguida dunha novela, The Hitchhiker's Guide to the Galaxy, publicada en 1979, unha serie de televisión en 1981, un xogo de ordenador en 1984 e unha película en 2005.",
-                    ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/b/bd/H2G2_UK_front_cover.jpg"
+                    ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/b/bd/H2G2_UK_front_cover.jpg",
+                    Destacado = true
                 },
                 new Producto
                 {
@@ -97,7 +98,8 @@
                         CategoriaId = 2,
                         Titulo = "Back to the Future",
                         Descripcion = "Back to the Future é un filme estadounidense dirixido por Robert Zemeckis que foi estreado en 1985. Escrito por Zemeckis e Bob Gale, producido por Steven Spielberg, e protagonizado por Michael J. Fox, Christopher Lloyd, Lea Thompson, Crispin Glover e Thomas F. Wilson.",
-                        ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/d/d2/Back_to_the_Future.jpg"
+                        ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/d/d2/Back_to_the_Future.jpg",
+                        Destacado = true
                     },
                     new Producto
                     {
@@ -129,7 +131,8 @@
                         CategoriaId = 3,
                         Titulo = "Day of the Tentacle",
                         Descripcion = "Día do tentáculo, tamén coñecido como Maniac Mansion II: Day of the Tentacle, [2] [3] é un xogo de aventura gráfica de 1993 desenvolvido e publicado por LucasArts. É a secuela do xogo Maniac Game Mansion de 1987. A trama segue a Bernard Bernoulli e os seus amigos de Hoagie e Laverne, xa que intentan deter o malvado tentáculo púrpura, un tentáculo sentente, desembarkado, de asumir o mundo. O xogador controla o trío e resolve crebacabezas mentres usa o tempo de viaxe para explorar diferentes períodos de historia..",
-                        ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/7/79/Day_of_the_Tentacle_artwork.jpg"
+                        ImaxeUrl = "https://upload.wikimedia.org/wikipedia/en/7/79/Day_of_the_Tentacle_artwork.jpg",
+                        Destacado = true
                     },
                     new Producto
                     {

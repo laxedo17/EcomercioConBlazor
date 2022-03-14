@@ -160,5 +160,18 @@
 
             return new ServiceResposta<List<string>> { Data = resultado };
         }
+
+        public async Task<ServiceResposta<List<Producto>>> GetProductosDestacados()
+        {
+            var resposta = new ServiceResposta<List<Producto>>
+            {
+                Data = await _context.Productos
+                    .Where(p => p.Destacado)
+                    .Include(p => p.Variantes)
+                    .ToListAsync()
+            };
+
+            return resposta;
+        }
     }
 }

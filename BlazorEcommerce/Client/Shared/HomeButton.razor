@@ -1,0 +1,11 @@
+﻿@inject NavigationManager NavigationManager
+
+<button @onclick="IrAInicio" class="btn btn-outline-primary home-button">
+    A tenda da chic
+</button>
+
+@code {
+private void IrAInicio(){
+    NavigationManager.NavigateTo("");
+}
+}

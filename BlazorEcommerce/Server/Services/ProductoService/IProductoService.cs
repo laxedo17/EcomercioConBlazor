@@ -7,5 +7,6 @@
         Task<ServiceResposta<List<Producto>>> GetProductosPorCategoriaAsync(string categoriaUrl);
         Task<ServiceResposta<List<Producto>>> SearchProductos(string busquedaText);
         Task<ServiceResposta<List<string>>> GetProductosSearchSuxerencias(string busquedaText);
+        Task<ServiceResposta<List<Producto>>> GetProductosDestacados();
     }
 }
