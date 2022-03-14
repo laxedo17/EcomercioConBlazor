@@ -10,7 +10,10 @@
         //Con este evento faremos uso do metodo do metodo de lifecycle OnParametersSet()
         event Action ProductosCambiaron; //imos a Index.razor para implementar OnParametersSetAsync e activar o evento e desde ali imos ao component ProductoList.razor do proxecto Client
         string Mensaxe { get; set; } //para dar unha mensaxe que empezara no servicio para darlle informacion ao usuario nas busquedas solicitadas
-        Task SearchProductos(string busquedaText);
+        int PaxinaActual { get; set; }
+        int ContaPaxinas { get; set; }
+        string LastBusquedaText { get; set; }
+        Task SearchProductos(string busquedaText, int paxina);
         Task<List<string>> GetProductoSearchSuxerencias(string busquedaText);
     }
 

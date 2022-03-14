@@ -86,14 +86,40 @@
         /// </summary>
         /// <param name="busquedaText"></param>
         /// <returns></returns>
-        public async Task<ServiceResposta<List<Producto>>> SearchProductos(string busquedaText)
+        public async Task<ServiceResposta<ProductoSearchResultsDto>> SearchProductos(string busquedaText, int paxina)
         {
-            var resposta = new ServiceResposta<List<Producto>>
+            var numeroResultadosPorPaxina = 2f;
+            var contaPaxinas = Math.Ceiling((await FindProductosPorBusquedaTexto(busquedaText)).Count / numeroResultadosPorPaxina);
+            var productos = await _context.Productos
+                            .Where(p => p.Titulo.ToLower().Contains(busquedaText.ToLower())
+                            ||
+                            p.Descripcion.ToLower().Contains(busquedaText.ToLower()))
+                                .Include(p => p.Variantes)
+                                .Skip((paxina - 1) * (int)numeroResultadosPorPaxina)
+                                .Take((int)numeroResultadosPorPaxina)
+                                .ToListAsync();
+
+            var resposta = new ServiceResposta<ProductoSearchResultsDto>
             {
-                Data = await FindProductosPorBusquedaTexto(busquedaText)
+                Data = new ProductoSearchResultsDto
+                {
+                    Productos = productos,
+                    PaxinaActual = paxina,
+                    Paxinas = (int)contaPaxinas
+                }
             };
-            return resposta; //tras convertir o anterior a unha lista, devolvemos todo
+            return resposta;
         }
+
+        //version inicial, sen usar DTOs
+        // public async Task<ServiceResposta<List<Producto>>> SearchProductos(string busquedaText)
+        // {
+        //     var resposta = new ServiceResposta<List<Producto>>
+        //     {
+        //         Data = await FindProductosPorBusquedaTexto(busquedaText)
+        //     };
+        //     return resposta; //tras convertir o anterior a unha lista, devolvemos todo
+        // }
 
         /// <summary>
         /// Metodo extraido de SearchProductos

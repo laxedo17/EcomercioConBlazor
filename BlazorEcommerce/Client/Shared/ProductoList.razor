@@ -30,6 +30,11 @@ else
             </li>
         }
     </ul>
+    for (var i = 1; i <= ProductoService.ContaPaxinas; i++)
+    {
+        <a class="btn @(i == ProductoService.PaxinaActual ? "btn-info" : "btn-outline-info") paxina-seleccion"
+    href="/search/@ProductoService.LastBusquedaText/@i">@i</a>
+    }
 }
 
 
