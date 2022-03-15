@@ -1,15 +1,51 @@
 ﻿@page "/register"
+@inject IAuthService AuthService
 
 <PageTitle>Rexistro na web</PageTitle>
 <h3>Register</h3>
 
-<EditForm Model="usuario"></EditForm>
+<EditForm Model="usuario" OnValidSubmit="ManexarRexistro">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="usuario.Email" class="form-control" />
+        <ValidationMessage For="@(() => usuario.Email)" />
+    </div>
+    <div class="mb-3">
+        <label for="password">Password</label>
+        <InputText id="password" @bind-Value="usuario.Password" class="form-control" type="password" />
+        <ValidationMessage For="@(() => usuario.Password)" />
+    </div>
+    <div class="mb-3">
+        <label for="confirmaPassword">Confirmar password</label>
+        <InputText id="confirmaPassword" @bind-Value="usuario.ConfirmaPassword" class="form-control" type="password" />
+        <ValidationMessage For="@(() => usuario.ConfirmaPassword)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Rexistrarse</button>
+    <div class="@mensaxeCssClass">
+        <span>@mensaxe</span>
+    </div>
+
+</EditForm>
 
 @code {
-    UsuarioRexistro usuario = new UsuarioRexistro();
+    UsuarioRegister usuario = new UsuarioRegister();
 
-    void ManexarRexistro()
+    string mensaxe = string.Empty;
+    string mensaxeCssClass = string.Empty;
+
+    async Task ManexarRexistro()
     {
-        Console.WriteLine($"Rexistro de usuario con Email {usuario.Email}");
+        var resultado = await AuthService.Register(usuario);
+        mensaxe = resultado.Mensaxe;
+        if (resultado.Exito)
+        {
+            mensaxeCssClass = "text-success";
+        }
+        else
+        {
+            mensaxeCssClass = "text-danger";
+        }
+        //Console.WriteLine($"Rexistro de usuario con Email {usuario.Email}");
     }
 }

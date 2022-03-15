@@ -1,0 +1,26 @@
+﻿@page "/login"
+<PageTitle>Login</PageTitle>
+
+<EditForm Model="usuario" OnValidSubmit="ManexarLogin">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="usuario.Email" class="form-control" />
+        <ValidationMessage For="@(() => usuario.Email)" />
+    </div>
+    <div class="mb-3">
+        <label for="password">Password</label>
+        <InputText id="password" @bind-Value="usuario.Password" class="form-control" type="password" />
+        <ValidationMessage For="@(() => usuario.Password)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Entrar</button>
+
+</EditForm>
+
+@code {
+    private UserLogin usuario = new UserLogin();
+    private async Task ManexarLogin()
+    {
+        Console.WriteLine("Loggeandose! :)");
+    }
+}

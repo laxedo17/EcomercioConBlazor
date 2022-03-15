@@ -7,6 +7,7 @@
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<ProductoType> ProductoTypes { get; set; }
         public DbSet<ProductoVariante> ProductoVariantes { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
