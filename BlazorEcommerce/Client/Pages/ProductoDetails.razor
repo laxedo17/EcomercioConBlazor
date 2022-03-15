@@ -1,5 +1,6 @@
 ﻿@page "/producto/{id:int}"
 @inject IProductoService ProductoService
+@inject ICarroService CarroService
 
 @if (producto == null)
 {
@@ -36,6 +37,9 @@ else
                     @GetVarianteSeleccionada().Precio€
                 </h4>
             }
+            <button class="btn btn-primary" @onclick="AddToCarro">
+                <i class="oi oi-cart"></i>&nbsp;&nbsp;&nbsp; Engadir a carro
+            </button>
         </div>
     </div>
 }
@@ -81,5 +85,17 @@ else
         //producto actualmente seleccionado
         var variante = producto.Variantes.FirstOrDefault(v => v.ProductoTypeId == actualTypeId);
         return variante;
+    }
+
+    private async Task AddToCarro()
+    {
+        var productoVariante = GetVarianteSeleccionada();
+        var carroItem = new CarroItem
+        {
+            ProductoId = productoVariante.ProductoId,
+            ProductoTypeId = productoVariante.ProductoTypeId
+        };
+
+        await CarroService.AddToCarro(carroItem);
     }
 }

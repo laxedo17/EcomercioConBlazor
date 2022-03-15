@@ -1,0 +1,15 @@
+﻿@page "/register"
+
+<PageTitle>Rexistro na web</PageTitle>
+<h3>Register</h3>
+
+<EditForm Model="usuario"></EditForm>
+
+@code {
+    UsuarioRexistro usuario = new UsuarioRexistro();
+
+    void ManexarRexistro()
+    {
+        Console.WriteLine($"Rexistro de usuario con Email {usuario.Email}");
+    }
+}

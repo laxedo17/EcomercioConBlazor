@@ -1,0 +1,27 @@
+﻿@inject ICarroService CarroService
+@inject ISyncLocalStorageService LocalStorage
+@implements IDisposable
+
+<a href="carro" class="btn btn-info">
+    <i class="oi oi-cart"></i>
+    <span class="badge">@GetCarroItemsCount()</span>
+</a>
+
+@code {
+    private int GetCarroItemsCount()
+    {
+        var carro = LocalStorage.GetItem<List<CarroItem>>("carro");
+        return carro != null ? carro.Count : 0;
+    }
+
+    //suscribimonos ao evento por se hai cambios no carro
+    protected override void OnInitialized()
+    {
+        CarroService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        CarroService.OnChange -= StateHasChanged;
+    }
+}
