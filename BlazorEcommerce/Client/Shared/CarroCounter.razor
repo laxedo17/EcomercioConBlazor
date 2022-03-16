@@ -10,8 +10,8 @@
 @code {
     private int GetCarroItemsCount()
     {
-        var carro = LocalStorage.GetItem<List<CarroItem>>("carro");
-        return carro != null ? carro.Count : 0;
+        var conta = LocalStorage.GetItem<int>("carroItemsCount");
+        return conta;
     }
 
     //suscribimonos ao evento por se hai cambios no carro

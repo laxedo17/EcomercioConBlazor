@@ -8,6 +8,7 @@ namespace BlazorEcommerce.Shared
 {
     public class CarroItem
     {
+        public int UsuarioId { get; set; }
         public int ProductoId { get; set; }
         public int ProductoTypeId { get; set; }
         public int Cantidade { get; set; } = 1;

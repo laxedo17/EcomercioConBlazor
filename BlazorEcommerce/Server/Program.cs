@@ -38,6 +38,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddHttpContextAccessor(); //isto engadimolo para que vaia implicito no servicio e non tenhamos que chamar a userId no CarroController no metodo GardarItemsCarro e asi inxectamolo no constructor de CarroService
+
 var app = builder.Build();
 
 app.UseSwaggerUI(); //engadimos Swagger na variable app

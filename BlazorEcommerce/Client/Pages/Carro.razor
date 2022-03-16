@@ -21,11 +21,10 @@ else
                     <h5><a href="/producto/@producto.ProductoId">@producto.Titulo</a></h5>
                     <span>@producto.ProductoType</span><br />
                     <input type="number" value="@producto.Cantidade"
-                   @onchange="@((ChangeEventArgs e) => UpdateCantidade(e, producto))"
-                   class="form-control entrada-cantidade"
-                   min="1" />
+                @onchange="@((ChangeEventArgs e) => UpdateCantidade(e, producto))"
+                class="form-control entrada-cantidade" min="1" />
                     <button class="btn-delete"
-                    @onclick="@(() => RemoveProductoDeCarro(producto.ProductoId, producto.ProductoTypeId))">
+                @onclick="@(() => RemoveProductoDeCarro(producto.ProductoId, producto.ProductoTypeId))">
                         Quitar
                     </button>
                 </div>
@@ -55,14 +54,11 @@ else
 
     private async Task CargarCarro()
     {
-        if ((await CarroService.GetCarroItems()).Count == 0)
+        await CarroService.GetCarroItemsCount();
+        carroProductos = await CarroService.GetCarroProductos();
+        if (carroProductos == null || carroProductos.Count == 0)
         {
-            mensaxe = "O teu carro non ten nada";
-            carroProductos = new List<CarroProductoRespostaDto>();
-        }
-        else
-        {
-            carroProductos = await CarroService.GetCarroProductos();
+            mensaxe = "O teu carro esta vacio";
         }
     }
 

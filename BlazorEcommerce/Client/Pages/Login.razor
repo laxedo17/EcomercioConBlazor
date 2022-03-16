@@ -4,6 +4,7 @@
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ICarroService CarroService
 
 <PageTitle>Login</PageTitle>
 
@@ -49,6 +50,8 @@
 
             await LocalStorage.SetItemAsync("authToken", resultado.Data);
             await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            await CarroService.GardarItemsCarro(true); //gardamos os elementos do carro e vaciamos o localstorage
+            await CarroService.GetCarroItemsCount();
             NavigationManager.NavigateTo(returnUrl);
         }
         else
