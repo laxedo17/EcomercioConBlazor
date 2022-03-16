@@ -1,14 +1,19 @@
-﻿using System.Security.Cryptography;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BlazorEcommerce.Server.Services.AuthService
 {
     public class AuthService : IAuthService
     {
         private readonly DataContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AuthService(DataContext context)
+        public AuthService(DataContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<ServiceResposta<int>> Register(Usuario usuario, string password)
@@ -86,8 +91,46 @@ namespace BlazorEcommerce.Server.Services.AuthService
 
         private string? CreateToken(Usuario usuario)
         {
-            throw new NotImplementedException();
+            List<Claim> claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                new Claim(ClaimTypes.Name, usuario.Email)
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
+                .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
         }
 
+        public async Task<ServiceResposta<bool>> ChangePassword(int usuarioId, string novoPassword)
+        {
+            var usuario = await _context.Usuarios.FindAsync(usuarioId);
+            if (usuario == null)
+            {
+                return new ServiceResposta<bool>
+                {
+                    Exito = false,
+                    Mensaxe = "Usuario non atopado"
+                };
+            }
+
+            CreatePasswordHash(novoPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            usuario.PasswordHash = passwordHash;
+            usuario.PasswordSalt = passwordSalt;
+
+            await _context.SaveChangesAsync();
+
+            return new ServiceResposta<bool> { Data = true, Mensaxe = "Modificouse o password" };
+        }
     }
 }

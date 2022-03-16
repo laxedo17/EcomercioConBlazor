@@ -1,12 +1,20 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(TendaLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(TendaLayout)">
-            <p role="alert">Sentindoo moito, non hai nada nesta direccion.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(TendaLayout)">
+                <NotAuthorized>
+                    <h3>Unha pena. Non estas autorizado a ver esta paxina.</h3>
+                    <h5>Por favor, <a href="login">entra</a> ou <a href="register">rexistrate</a> cunha nova conta.
+                    </h5>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(TendaLayout)">
+                <p role="alert">Sentindoo moito, non hai nada nesta direccion.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

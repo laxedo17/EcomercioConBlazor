@@ -1,10 +1,25 @@
-﻿<div class="dropdown">
+﻿@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="dropdown">
     <button @onclick="ToggleMenuUsuario" @onfocusout="HideMenuUsuario"
         class="btn btn-secondary dropdown-toggle usuario-button">
         <i class="oi oi-person"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right @UsuarioMenuCssClass">
-        <a href="register" class="dropdown-item">Rexistro</a>
+        <AuthorizeView>
+            <Authorized>
+                <a href="profile" class="dropdown-item">Perfil</a>
+                <hr />
+                <button class="dropdown-item" @onclick="Logout">Sair</button>
+            </Authorized>
+            <NotAuthorized>
+                <a href="login?returnUrl=@NavigationManager.ToBaseRelativePath(NavigationManager.Uri)"
+                    class="dropdown-item">Entrar</a>
+                <a href="register" class="dropdown-item">Rexistro</a>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </div>
 
@@ -21,5 +36,12 @@
     {
         await Task.Delay(200); //necesario porque senon o evento focus out que editamos arriba cancela a navegacion dos enlaces
         mostrarUsuarioMenu = false;
+    }
+
+    private async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync("authToken");
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        NavigationManager.NavigateTo("");
     }
 }

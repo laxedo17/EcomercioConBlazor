@@ -5,6 +5,7 @@ global using BlazorEcommerce.Client.Services.CategoriaService;
 global using Blazored.LocalStorage;
 global using BlazorEcommerce.Client.Services.CarroService;
 global using BlazorEcommerce.Client.Services.AuthService;
+global using Microsoft.AspNetCore.Components.Authorization;
 using BlazorEcommerce.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -20,5 +21,9 @@ builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>(); //igual que ProductoService, rexistramos con Dependency Injection
 builder.Services.AddScoped<ICarroService, CarroService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+//para autorizacion de usuarios e proveedor de cambio de estados -que ven do namespace Microsoft.AspNetCore.Components.Authorization-
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
 await builder.Build().RunAsync();
