@@ -23,5 +23,6 @@ namespace BlazorEcommerce.Shared
         public decimal Precio { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal OrixinalPrecio { get; set; } //Por si usamos un desconto
+        
     }
 }

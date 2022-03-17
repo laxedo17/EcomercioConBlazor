@@ -1,0 +1,39 @@
+﻿@page "/pedidos"
+@inject IPedidoService PedidoService
+
+<h3>Pedidos</h3>
+
+@if (pedidos == null)
+{
+    <span>Cargando os teus pedidos...</span>
+}
+else if (pedidos.Count <= 0)
+{
+    <span>Ata o momento non tes pedidos realizados. </span>
+}
+else
+{
+    foreach (var pedido in pedidos)
+    {
+        <div class="container">
+            <div class="imaxe-wrapper">
+                <img src="@pedido.ProductoImaxeUrl" class="imaxe" />
+            </div>
+            <div class="detalles">
+                <h4>@pedido.Producto</h4>
+                <span>@pedido.PedidoDate</span>
+                <a href="pedidos/@pedido.Id">Mostrar mais...</a>
+            </div>
+            <div class="pedido-precio">@pedido.PrecioTotal€</div>
+        </div>
+    }
+}
+
+
+@code {
+    List<PedidoResumenRespostaDto> pedidos = null;
+    protected override async Task OnInitializedAsync()
+    {
+        pedidos = await PedidoService.GetPedidos();
+    }
+}

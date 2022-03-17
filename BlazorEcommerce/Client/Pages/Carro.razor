@@ -1,5 +1,7 @@
 ﻿@page "/carro"
 @inject ICarroService CarroService
+@inject IPedidoService PedidoService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Carriño da Compra</PageTitle>
 <h3>Carriño da compra</h3>
@@ -8,6 +10,11 @@
 {
     <span>@mensaxe</span>
 }
+@* non nos fai falta isto porque crearemos unha paxina de agradecemento ao cliente aparte
+    else if (pedidoRealizado)
+    {
+    <span>Gracias por completar o pedido! Podes comprobar os teus pedidos <a href="pedidos">aqui</a>.</span>
+    }*@
 else
 {
     <div>
@@ -21,10 +28,10 @@ else
                     <h5><a href="/producto/@producto.ProductoId">@producto.Titulo</a></h5>
                     <span>@producto.ProductoType</span><br />
                     <input type="number" value="@producto.Cantidade"
-                @onchange="@((ChangeEventArgs e) => UpdateCantidade(e, producto))"
-                class="form-control entrada-cantidade" min="1" />
+                   @onchange="@((ChangeEventArgs e) => UpdateCantidade(e, producto))"
+                   class="form-control entrada-cantidade" min="1" />
                     <button class="btn-delete"
-                @onclick="@(() => RemoveProductoDeCarro(producto.ProductoId, producto.ProductoTypeId))">
+                    @onclick="@(() => RemoveProductoDeCarro(producto.ProductoId, producto.ProductoTypeId))">
                         Quitar
                     </button>
                 </div>
@@ -35,14 +42,17 @@ else
             Total (@carroProductos.Count): @carroProductos.Sum(producto => @producto.Precio * producto.Cantidade)€
         </div>
     </div>
+    <button @onclick="FacerPedido" class="btn alert-success float-end mt-1">Realizar pago</button>
 }
 
 @code {
     List<CarroProductoRespostaDto> carroProductos = null;
     string mensaxe = "Cargando carro.....";
+    //xa non sera necesaria esta flag bool pedidoRealizado = false;
 
     protected override async Task OnInitializedAsync()
     {
+        //pedidoRealizado = false;
         await CargarCarro();
     }
 
@@ -70,5 +80,16 @@ else
             producto.Cantidade = 1;
         }
         await CarroService.UpdateCantidade(producto);
+    }
+
+    private async Task FacerPedido()
+    {
+        //await PedidoService.FacerPedido();
+        //await CarroService.GetCarroItemsCount();
+        //pedidoRealizado = true;
+
+        //refactorizado abaixo para aceptar pagos con Stripe
+        string url = await PedidoService.FacerPedido();
+        NavigationManager.NavigateTo(url);
     }
 }

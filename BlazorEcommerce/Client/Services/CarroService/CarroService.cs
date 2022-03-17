@@ -4,51 +4,46 @@
     {
         private readonly ILocalStorageService _localStorage;
         private readonly HttpClient _http;
-        private readonly AuthenticationStateProvider _authStateProvider;
+        private readonly IAuthService _authService;
 
-        public CarroService(ILocalStorageService localStorage, HttpClient http, AuthenticationStateProvider authStateProvider)
+        public CarroService(ILocalStorageService localStorage, HttpClient http, IAuthService authService)
         {
             _localStorage = localStorage;
             _http = http;
-            _authStateProvider = authStateProvider;
+            _authService = authService;
         }
         public event Action OnChange;
 
-        private async Task<bool> IsUsuarioAuthenticated()
-        {
-            return (await _authStateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
-        }
-
-
         public async Task AddToCarro(CarroItem carroItem)
         {
-            if (await IsUsuarioAuthenticated())
+            if (await _authService.IsUsuarioAuthenticated())
             {
-                Console.WriteLine("usuario autenticado");
+                //Console.WriteLine("usuario autenticado");
+                await _http.PostAsJsonAsync("api/carro/add", carroItem);
             }
             else
             {
-                Console.WriteLine("usuario non autenticado");
+                //Console.WriteLine("usuario non autenticado");
+                var carro = await _localStorage.GetItemAsync<List<CarroItem>>("carro");
+                if (carro == null)
+                {
+                    carro = new List<CarroItem>();
+                }
+
+                var mismoItem = carro.Find(x => x.ProductoId == carroItem.ProductoId && x.ProductoTypeId == carroItem.ProductoTypeId);
+                if (mismoItem == null)
+                {
+                    carro.Add(carroItem);
+                }
+                else
+                {
+                    mismoItem.Cantidade += carroItem.Cantidade;
+                }
+
+                await _localStorage.SetItemAsync("carro", carro);
             }
 
-            var carro = await _localStorage.GetItemAsync<List<CarroItem>>("carro");
-            if (carro == null)
-            {
-                carro = new List<CarroItem>();
-            }
-
-            var mismoItem = carro.Find(x => x.ProductoId == carroItem.ProductoId && x.ProductoTypeId == carroItem.ProductoTypeId);
-            if (mismoItem == null)
-            {
-                carro.Add(carroItem);
-            }
-            else
-            {
-                mismoItem.Cantidade += carroItem.Cantidade;
-            }
-
-            await _localStorage.SetItemAsync("carro", carro);
-            await GetCarroItemsCount();
+            await GetCarroItemsCount(); //en ambos casos, sexa ou non usuario autenticado, refrescamos a conta de elementos do carro actuales
         }
 
         /*
@@ -68,7 +63,7 @@
 
         public async Task<List<CarroProductoRespostaDto>> GetCarroProductos()
         {
-            if (await IsUsuarioAuthenticated())
+            if (await _authService.IsUsuarioAuthenticated())
             {
                 var resposta = await _http.GetFromJsonAsync<ServiceResposta<List<CarroProductoRespostaDto>>>("api/carro");
                 return resposta.Data;
@@ -90,34 +85,55 @@
 
         public async Task RemoveProductoDeCarro(int productoId, int productoTypeId)
         {
-            var carro = await _localStorage.GetItemAsync<List<CarroItem>>("carro");
-            if (carro == null)
+            if (await _authService.IsUsuarioAuthenticated())
             {
-                return;
+                await _http.DeleteAsync($"api/carro/{productoId}/{productoTypeId}");
             }
-            var carroItem = carro.Find(x => x.ProductoId == productoId
-                && x.ProductoTypeId == productoTypeId);
-            if (carroItem != null)
+            else
             {
-                carro.Remove(carroItem);
-                await _localStorage.SetItemAsync("carro", carro);
-                await GetCarroItemsCount();
+                var carro = await _localStorage.GetItemAsync<List<CarroItem>>("carro");
+                if (carro == null)
+                {
+                    return;
+                }
+                var carroItem = carro.Find(x => x.ProductoId == productoId
+                    && x.ProductoTypeId == productoTypeId);
+                if (carroItem != null)
+                {
+                    carro.Remove(carroItem);
+                    await _localStorage.SetItemAsync("carro", carro);
+                }
             }
+            //non o necesitamos isto porque temos no Carro.razor un metodo que lee os obxetos que hai no carro await GetCarroItemsCount();
         }
 
         public async Task UpdateCantidade(CarroProductoRespostaDto producto)
         {
-            var carro = await _localStorage.GetItemAsync<List<CarroItem>>("carro");
-            if (carro == null)
+            if (await _authService.IsUsuarioAuthenticated())
             {
-                return;
+                var request = new CarroItem
+                {
+                    ProductoId = producto.ProductoId,
+                    Cantidade = producto.Cantidade,
+                    ProductoTypeId = producto.ProductoTypeId
+                };
+
+                await _http.PutAsJsonAsync("api/carro/update-cantidade", request);
             }
-            var carroItem = carro.Find(x => x.ProductoId == producto.ProductoId
-                && x.ProductoTypeId == producto.ProductoTypeId);
-            if (carroItem != null)
+            else
             {
-                carroItem.Cantidade = producto.Cantidade;
-                await _localStorage.SetItemAsync("carro", carro);
+                var carro = await _localStorage.GetItemAsync<List<CarroItem>>("carro");
+                if (carro == null)
+                {
+                    return;
+                }
+                var carroItem = carro.Find(x => x.ProductoId == producto.ProductoId
+                    && x.ProductoTypeId == producto.ProductoTypeId);
+                if (carroItem != null)
+                {
+                    carroItem.Cantidade = producto.Cantidade;
+                    await _localStorage.SetItemAsync("carro", carro);
+                }
             }
         }
 
@@ -139,7 +155,7 @@
 
         public async Task GetCarroItemsCount()
         {
-            if (await IsUsuarioAuthenticated())
+            if (await _authService.IsUsuarioAuthenticated())
             {
                 var resultado = await _http.GetFromJsonAsync<ServiceResposta<int>>("api/carro/conta");
                 var conta = resultado.Data;

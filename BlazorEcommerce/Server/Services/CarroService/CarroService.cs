@@ -5,16 +5,15 @@ namespace BlazorEcommerce.Server.Services.CarroService
     public class CarroService : ICarroService
     {
         private readonly DataContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAuthService _authService;
 
-        public CarroService(DataContext context, IHttpContextAccessor httpContextAccessor)
+        public CarroService(DataContext context, IAuthService authService)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
+            _authService = authService;
         }
 
         //refactorizamos o codigo para usar un pequeno metodo que nos permitira obter a Id de usuario con httpContextAccessor e asi facer o codigo mais simple no metodo GardarItemsCarro
-        private int GetUsuarioId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
         public async Task<ServiceResposta<List<CarroProductoRespostaDto>>> GetCarroProductos(List<CarroItem> carroItems)
         {
             //establecemos os datos a unha lista de CarroProductoResposta
@@ -64,7 +63,7 @@ namespace BlazorEcommerce.Server.Services.CarroService
 
         public async Task<ServiceResposta<List<CarroProductoRespostaDto>>> GardarItemsCarro(List<CarroItem> carroItems)
         {
-            carroItems.ForEach(carroItem => carroItem.UsuarioId = GetUsuarioId());
+            carroItems.ForEach(carroItem => carroItem.UsuarioId = _authService.GetUsuarioId());
             _context.CarroItems.AddRange(carroItems); //AddRange en esencia permite engadir mais obxeto a taboa
             await _context.SaveChangesAsync();
             return await GetDbCarroProductos();
@@ -90,14 +89,82 @@ namespace BlazorEcommerce.Server.Services.CarroService
 
         public async Task<ServiceResposta<int>> GetCarroItemsCount()
         {
-            var conta = (await _context.CarroItems.Where(ci => ci.UsuarioId == GetUsuarioId()).ToListAsync()).Count;
+            var conta = (await _context.CarroItems.Where(ci => ci.UsuarioId == _authService.GetUsuarioId()).ToListAsync()).Count;
             return new ServiceResposta<int> { Data = conta };
         }
 
         public async Task<ServiceResposta<List<CarroProductoRespostaDto>>> GetDbCarroProductos()
         {
             return await GetCarroProductos(await _context.CarroItems
-                .Where(ci => ci.UsuarioId == GetUsuarioId()).ToListAsync());
+                .Where(ci => ci.UsuarioId == _authService.GetUsuarioId()).ToListAsync());
+        }
+
+        public async Task<ServiceResposta<bool>> AddToCarro(CarroItem carroItem)
+        {
+            carroItem.UsuarioId = _authService.GetUsuarioId();
+
+            var mismoItem = await _context.CarroItems
+                .FirstOrDefaultAsync(ci => ci.ProductoId == carroItem.ProductoId &&
+                ci.ProductoTypeId == carroItem.ProductoTypeId &&
+                ci.UsuarioId == carroItem.UsuarioId);
+
+            if (mismoItem == null)
+            {
+                _context.CarroItems.Add(carroItem);
+            }
+            //se atopamos o item do carro coa misma id, enton sumamos a cantidade ao carro
+            else
+            {
+                mismoItem.Cantidade += carroItem.Cantidade;
+            }
+
+            await _context.SaveChangesAsync();
+            return new ServiceResposta<bool> { Data = true };
+        }
+
+        public async Task<ServiceResposta<bool>> UpdateCantidade(CarroItem carroItem)
+        {
+            var dbCarroItem = await _context.CarroItems
+                .FirstOrDefaultAsync(ci => ci.ProductoId == carroItem.ProductoId &&
+                ci.ProductoTypeId == carroItem.ProductoTypeId &&
+                ci.UsuarioId == _authService.GetUsuarioId());
+
+            if (dbCarroItem == null)
+            {
+                return new ServiceResposta<bool>
+                {
+                    Data = false,
+                    Exito = false,
+                    Mensaxe = "O elemento do carro non existe"
+                };
+            }
+
+            dbCarroItem.Cantidade = carroItem.Cantidade;
+            await _context.SaveChangesAsync();
+            return new ServiceResposta<bool> { Data = true };
+        }
+
+        public async Task<ServiceResposta<bool>> RemoveItemDeCarro(int productoId, int productoTypeId)
+        {
+            var dbCarroItem = await _context.CarroItems
+                .FirstOrDefaultAsync(ci => ci.ProductoId == productoId &&
+                ci.ProductoTypeId == productoTypeId &&
+                ci.UsuarioId == _authService.GetUsuarioId());
+
+            if (dbCarroItem == null)
+            {
+                return new ServiceResposta<bool>
+                {
+                    Data = false,
+                    Exito = false,
+                    Mensaxe = "O elemento do carro non existe"
+                };
+            }
+            //si encontramos o item actual
+            _context.CarroItems.Remove(dbCarroItem);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResposta<bool> { Data = true };
         }
     }
 }

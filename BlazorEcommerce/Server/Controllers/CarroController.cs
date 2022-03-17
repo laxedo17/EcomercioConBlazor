@@ -42,7 +42,7 @@ namespace BlazorEcommerce.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<ServiceResposta<List<CarroProductoRespostaDto>>>> GardarItemsCarro(List<CarroItem> carroItems)
         {
-            var usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            //var usuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var resultado = await _carroService.GardarItemsCarro(carroItems);
             return Ok(resultado);
         }
@@ -57,5 +57,26 @@ namespace BlazorEcommerce.Server.Controllers
             return Ok(resultado);
         }
         */
+
+        [HttpPost("add")]
+        public async Task<ActionResult<ServiceResposta<bool>>> AddToCarro(CarroItem carroItem)
+        {
+            var resultado = await _carroService.AddToCarro(carroItem);
+            return Ok(resultado);
+        }
+
+        [HttpPut("update-cantidade")]
+        public async Task<ActionResult<ServiceResposta<bool>>> UpdateCantidade(CarroItem carroItem)
+        {
+            var resultado = await _carroService.UpdateCantidade(carroItem);
+            return Ok(resultado);
+        }
+
+        [HttpDelete("{productoId}/{productoTypeId}")]
+        public async Task<ActionResult<ServiceResposta<bool>>> RemoveItemDeCarro(int productoId, int productoTypeId)
+        {
+            var resultado = await _carroService.RemoveItemDeCarro(productoId, productoTypeId);
+            return Ok(resultado);
+        }
     }
 }

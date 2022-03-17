@@ -9,6 +9,8 @@
         public DbSet<ProductoVariante> ProductoVariantes { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<CarroItem> CarroItems { get; set; }
+        public DbSet<Pedido> Pedidos { get; set; }
+        public DbSet<PedidoProducto> PedidoProductos { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -29,6 +31,9 @@
             //tamen necesitamos unha clave composta para os items de carro, a clave composta de id de producto e a id de tipo de producto e a Id de Usuario
             modelBuilder.Entity<CarroItem>()
                 .HasKey(ci => new { ci.ProductoId, ci.ProductoTypeId, ci.UsuarioId });
+
+            modelBuilder.Entity<PedidoProducto>()
+            .HasKey(pepr => new { pepr.PedidoId, pepr.ProductoId, pepr.ProductoTypeId });
 
             modelBuilder.Entity<Categoria>().HasData(
                 new Categoria

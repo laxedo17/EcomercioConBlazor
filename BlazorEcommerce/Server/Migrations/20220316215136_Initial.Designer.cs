@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorEcommerce.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220315172640_Usuarios")]
-    partial class Usuarios
+    [Migration("20220316215136_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,25 @@ namespace BlazorEcommerce.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("BlazorEcommerce.Shared.CarroItem", b =>
+                {
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductoTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidade")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductoId", "ProductoTypeId", "UsuarioId");
+
+                    b.ToTable("CarroItems");
+                });
 
             modelBuilder.Entity("BlazorEcommerce.Shared.Categoria", b =>
                 {
@@ -63,6 +82,54 @@ namespace BlazorEcommerce.Server.Migrations
                             Nome = "Video xogos",
                             Url = "video-xogos"
                         });
+                });
+
+            modelBuilder.Entity("BlazorEcommerce.Shared.Pedido", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("PedidoDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PrecioTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pedidos");
+                });
+
+            modelBuilder.Entity("BlazorEcommerce.Shared.PedidoProducto", b =>
+                {
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductoTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Cantidade")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PrecioTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PedidoId", "ProductoId", "ProductoTypeId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.HasIndex("ProductoTypeId");
+
+                    b.ToTable("PedidoProductos");
                 });
 
             modelBuilder.Entity("BlazorEcommerce.Shared.Producto", b =>
@@ -438,6 +505,33 @@ namespace BlazorEcommerce.Server.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("BlazorEcommerce.Shared.PedidoProducto", b =>
+                {
+                    b.HasOne("BlazorEcommerce.Shared.Pedido", "Pedido")
+                        .WithMany("PedidoProductos")
+                        .HasForeignKey("PedidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BlazorEcommerce.Shared.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BlazorEcommerce.Shared.ProductoType", "ProductoType")
+                        .WithMany()
+                        .HasForeignKey("ProductoTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pedido");
+
+                    b.Navigation("Producto");
+
+                    b.Navigation("ProductoType");
+                });
+
             modelBuilder.Entity("BlazorEcommerce.Shared.Producto", b =>
                 {
                     b.HasOne("BlazorEcommerce.Shared.Categoria", "Categoria")
@@ -466,6 +560,11 @@ namespace BlazorEcommerce.Server.Migrations
                     b.Navigation("Producto");
 
                     b.Navigation("ProductoType");
+                });
+
+            modelBuilder.Entity("BlazorEcommerce.Shared.Pedido", b =>
+                {
+                    b.Navigation("PedidoProductos");
                 });
 
             modelBuilder.Entity("BlazorEcommerce.Shared.Producto", b =>
