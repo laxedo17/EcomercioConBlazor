@@ -11,6 +11,7 @@
         public DbSet<CarroItem> CarroItems { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<PedidoProducto> PedidoProductos { get; set; }
+        public DbSet<Direccion> Direccions { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

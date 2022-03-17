@@ -1,0 +1,78 @@
+﻿@inject IDireccionService DireccionService
+
+@if (direccion == null)
+{
+    <span>Polo momento non especificaches unha direccion de entrega. <button class="btn" @onclick="InitDireccion">Engadir
+            direccion?</button></span>
+}
+else if (!editarDireccion)
+{
+    <p>
+        <span>@direccion.Nome @direccion.Apelidos</span><br />
+        <span>@direccion.Rua</span><br />
+        <span>@direccion.Cidade, @direccion.Provincia, @direccion.CP</span><br />
+        <span>@direccion.Pais</span><br />
+    </p>
+    <button class="btn btn-primary" @onclick="EditDireccion">Editar direccion</button>
+}
+else
+{
+    <EditForm Model="direccion" OnSubmit="SubmitDireccion">
+        <div class="mb-3">
+            <label for="nome">Nome</label>
+            <InputText id="nome" @bind-Value="direccion.Nome" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="apelidos">Apelidos</label>
+            <InputText id="apelidos" @bind-Value="direccion.Apelidos" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="rua">Rua</label>
+            <InputText id="rua" @bind-Value="direccion.Rua" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="cidade">Cidade</label>
+            <InputText id="cidade" @bind-Value="direccion.Cidade" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="provincia">Provincia</label>
+            <InputText id="provincia" @bind-Value="direccion.Provincia" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="cp">Codigo Postal</label>
+            <InputText id="cp" @bind-Value="direccion.CP" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="pais">Pais</label>
+            <InputText id="pais" @bind-Value="direccion.Pais" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Gardar</button>
+    </EditForm>
+}
+
+@code {
+    Direccion direccion = null;
+    bool editarDireccion = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        direccion = await DireccionService.GetDireccion();
+    }
+
+    private async Task SubmitDireccion()
+    {
+        editarDireccion = false;
+        direccion = await DireccionService.AddOuUpdateDireccion(direccion);
+    }
+
+    private void InitDireccion()
+    {
+        direccion = new Direccion();
+        editarDireccion = true;
+    }
+
+    private void EditDireccion()
+    {
+        editarDireccion = true;
+    }
+}

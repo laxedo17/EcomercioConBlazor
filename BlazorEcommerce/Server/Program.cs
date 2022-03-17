@@ -8,6 +8,7 @@ global using BlazorEcommerce.Server.Services.CarroService;
 global using BlazorEcommerce.Server.Services.AuthService;
 global using BlazorEcommerce.Server.Services.PedidoService;
 global using BlazorEcommerce.Server.Services.PagoService;
+global using BlazorEcommerce.Server.Services.DireccionService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -30,6 +31,7 @@ builder.Services.AddScoped<ICarroService, CarroService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
+builder.Services.AddScoped<IDireccionService, DireccionService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

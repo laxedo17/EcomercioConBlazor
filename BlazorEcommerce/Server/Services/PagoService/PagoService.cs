@@ -73,10 +73,11 @@ namespace BlazorEcommerce.Server.Services.PagoService
             var opcions = new SessionCreateOptions
             {
                 CustomerEmail = _authService.GetUsuarioEmail(),
-                ShippingAddressCollection = new SessionShippingAddressCollectionOptions
-                {
-                    AllowedCountries = new List<string> { "US", }
-                },
+                ShippingAddressCollection =
+                    new SessionShippingAddressCollectionOptions
+                    {
+                        AllowedCountries = new List<string> { "US" }
+                    },
                 PaymentMethodTypes = new List<string>
                 {
                     "card"

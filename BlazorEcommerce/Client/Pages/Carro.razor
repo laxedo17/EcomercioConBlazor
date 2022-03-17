@@ -1,6 +1,7 @@
 ﻿@page "/carro"
 @inject ICarroService CarroService
 @inject IPedidoService PedidoService
+@inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Carriño da Compra</PageTitle>
@@ -28,10 +29,10 @@ else
                     <h5><a href="/producto/@producto.ProductoId">@producto.Titulo</a></h5>
                     <span>@producto.ProductoType</span><br />
                     <input type="number" value="@producto.Cantidade"
-                   @onchange="@((ChangeEventArgs e) => UpdateCantidade(e, producto))"
-                   class="form-control entrada-cantidade" min="1" />
+                @onchange="@((ChangeEventArgs e) => UpdateCantidade(e, producto))"
+                class="form-control entrada-cantidade" min="1" />
                     <button class="btn-delete"
-                    @onclick="@(() => RemoveProductoDeCarro(producto.ProductoId, producto.ProductoTypeId))">
+                @onclick="@(() => RemoveProductoDeCarro(producto.ProductoId, producto.ProductoTypeId))">
                         Quitar
                     </button>
                 </div>
@@ -42,17 +43,27 @@ else
             Total (@carroProductos.Count): @carroProductos.Sum(producto => @producto.Precio * producto.Cantidade)€
         </div>
     </div>
+    @if (isAuthenticated)
+    {
+        <div>
+            <h5>Direcion de envío</h5>
+            <DireccionForm />
+        </div>
+    }
     <button @onclick="FacerPedido" class="btn alert-success float-end mt-1">Realizar pago</button>
 }
 
 @code {
     List<CarroProductoRespostaDto> carroProductos = null;
     string mensaxe = "Cargando carro.....";
-    //xa non sera necesaria esta flag bool pedidoRealizado = false;
+    bool isAuthenticated = false; //variable para comprobar se o usuario esta autenticado
+                                  //xa non sera necesaria esta flag bool pedidoRealizado = false;
 
     protected override async Task OnInitializedAsync()
     {
         //pedidoRealizado = false;
+        isAuthenticated = await AuthService.IsUsuarioAuthenticated(); 
+        //comprobamos que o usuario este autenticado cando se carga a paxina
         await CargarCarro();
     }
 
