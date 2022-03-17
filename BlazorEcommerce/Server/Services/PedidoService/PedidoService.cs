@@ -16,9 +16,9 @@ namespace BlazorEcommerce.Server.Services.PedidoService
         }
 
         //private int GetUsuarioId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-        public async Task<ServiceResposta<bool>> FacerPedido()
+        public async Task<ServiceResposta<bool>> FacerPedido(int usuarioId)
         {
-            var productos = (await _carroService.GetDbCarroProductos()).Data;
+            var productos = (await _carroService.GetDbCarroProductos(usuarioId)).Data;
             decimal precioTotal = 0;
             productos.ForEach(producto => precioTotal += producto.Precio * producto.Cantidade);
 
@@ -33,7 +33,7 @@ namespace BlazorEcommerce.Server.Services.PedidoService
 
             var pedido = new Pedido
             {
-                UsuarioId = _authService.GetUsuarioId(),
+                UsuarioId = usuarioId,
                 PedidoDate = DateTime.Now,
                 PrecioTotal = precioTotal,
                 PedidoProductos = pedidoProductos
@@ -42,7 +42,7 @@ namespace BlazorEcommerce.Server.Services.PedidoService
             _context.Pedidos.Add(pedido);
 
             _context.CarroItems.RemoveRange(_context.CarroItems
-                .Where(cp => cp.UsuarioId == _authService.GetUsuarioId())); //unha vez o usuario termina o pedido, eliminamos o pedido da cesta
+                .Where(cp => cp.UsuarioId == usuarioId)); //unha vez o usuario termina o pedido, eliminamos o pedido da cesta
 
             await _context.SaveChangesAsync();
 

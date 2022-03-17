@@ -14,12 +14,9 @@ namespace BlazorEcommerce.Server.Controllers
             _pedidoService = pedidoService;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ServiceResposta<bool>>> FacerPedido()
-        {
-            var resultado = await _pedidoService.FacerPedido();
-            return Ok(resultado);
-        }
+        //o metodo que existia aqui antes xa non o necesitamos porque agora UNICAMENTE a webhook deberia facer unha chamada para crear un pedido
+
+
 
         [HttpGet]
         public async Task<ActionResult<ServiceResposta<List<PedidoResumenRespostaDto>>>> GetPedidos()

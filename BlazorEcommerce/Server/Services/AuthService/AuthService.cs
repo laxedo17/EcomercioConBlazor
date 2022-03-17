@@ -19,6 +19,7 @@ namespace BlazorEcommerce.Server.Services.AuthService
         }
 
         public int GetUsuarioId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+        public string GetUsuarioEmail() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
 
         public async Task<ServiceResposta<int>> Register(Usuario usuario, string password)
         {
@@ -135,6 +136,11 @@ namespace BlazorEcommerce.Server.Services.AuthService
             await _context.SaveChangesAsync();
 
             return new ServiceResposta<bool> { Data = true, Mensaxe = "Modificouse o password" };
+        }
+
+        public async Task<Usuario> GetUsuarioPorEmail(string email)
+        {
+            return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email.Equals(email));
         }
     }
 }

@@ -93,10 +93,14 @@ namespace BlazorEcommerce.Server.Services.CarroService
             return new ServiceResposta<int> { Data = conta };
         }
 
-        public async Task<ServiceResposta<List<CarroProductoRespostaDto>>> GetDbCarroProductos()
+        public async Task<ServiceResposta<List<CarroProductoRespostaDto>>> GetDbCarroProductos(int? usuarioId = null)
         {
+            if (usuarioId == null) 
+            {
+                usuarioId = _authService.GetUsuarioId();
+            }
             return await GetCarroProductos(await _context.CarroItems
-                .Where(ci => ci.UsuarioId == _authService.GetUsuarioId()).ToListAsync());
+                .Where(ci => ci.UsuarioId == usuarioId).ToListAsync());
         }
 
         public async Task<ServiceResposta<bool>> AddToCarro(CarroItem carroItem)

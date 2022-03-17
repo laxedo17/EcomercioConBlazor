@@ -7,9 +7,9 @@ global using BlazorEcommerce.Server.Services.CategoriaService;
 global using BlazorEcommerce.Server.Services.CarroService;
 global using BlazorEcommerce.Server.Services.AuthService;
 global using BlazorEcommerce.Server.Services.PedidoService;
+global using BlazorEcommerce.Server.Services.PagoService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +29,7 @@ builder.Services.AddScoped<ICategoriaService, CategoriaService>(); //igual que c
 builder.Services.AddScoped<ICarroService, CarroService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
+builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

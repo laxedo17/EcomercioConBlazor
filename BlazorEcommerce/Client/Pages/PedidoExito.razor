@@ -1,0 +1,16 @@
+﻿@page "/pedido-exito"
+@inject ICarroService CarroService
+
+<PageTitle>Moitisimas gracias</PageTitle>
+
+<h3>Moitas gracias</h3>
+
+<span>Gracias por realizar o teu pedido. Podes ver os teus pedidos <a href="pedidos">aqui</a>.</span>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await CarroService.GetCarroItemsCount();
+    }
+
+}
