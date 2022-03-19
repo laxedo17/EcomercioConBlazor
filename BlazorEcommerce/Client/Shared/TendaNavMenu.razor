@@ -1,4 +1,5 @@
 ﻿@inject ICategoriaService CategoriaService
+@implements IDisposable
 
 <div class="top-row ps-3 navbar navbar-dark navbar-toggler-wrapper">
     <div class="container-fluid">
@@ -38,6 +39,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await CategoriaService.GetCategoriasAsync();
+        await CategoriaService.GetCategorias();
+        CategoriaService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        CategoriaService.OnChange -= StateHasChanged;
     }
 }

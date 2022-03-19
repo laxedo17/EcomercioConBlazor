@@ -1,0 +1,198 @@
+﻿@page "/admin/producto"
+@page "/admin/producto/{id:int}"
+@inject IProductoService ProductoService
+@inject IProductoTypeService ProductoTypeService
+@inject ICategoriaService CategoriaService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+@if (cargando)
+{
+    <span>@msg</span>
+}
+else
+{
+    @if (producto.Editar)
+    {
+        <h3>Editar "@producto.Titulo"</h3>
+    }
+    else if (producto.IsNew)
+    {
+        <h3>Crea un novo producto</h3>
+    }
+    <EditForm Model="producto" OnValidSubmit="AddOuUpdateProducto">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <div class="mb-0">
+            <label for="titulo">Titulo</label>
+            <InputText id="titulo" @bind-Value="producto.Titulo" class="form-control"></InputText>
+        </div>
+        <div class="mb-0">
+            <label for="imaxeUrl">Imaxe Url</label>
+            <InputText id="imageUrl" @bind-Value="producto.ImaxeUrl" class="form-control"></InputText>
+        </div>
+        <div class="mb-0">
+            <img src="@producto.ImaxeUrl" />
+        </div>
+        <div class="mb-0">
+            <label for="descripcion">Descripcion</label>
+            <InputTextArea id="descripcion" @bind-Value="producto.Descripcion" class="form-control"></InputTextArea>
+        </div>
+        <hr />
+
+        <div class="header">
+            <div class="col">Tipo de producto / Variante</div>
+            <div class="col">Precio</div>
+            <div class="col">Precio orixinal</div>
+            <div class="col">Visible</div>
+            <div class="col"></div>
+        </div>
+        @foreach (var variante in producto.Variantes)
+        {
+            <div class="row">
+                <div class="col">
+                    <InputSelect disabled="@variante.Deleted" @bind-Value="variante.ProductoTypeId" class="form-control">
+                        @foreach (var productoType in ProductoTypeService.ProductoTypes)
+                        {
+                    <option value="@productoType.Id.ToString()">@productoType.Nome</option>
+                        }
+            </InputSelect>
+        </div>
+        <div class="col">
+            <InputNumber @bind-Value="variante.Precio" class="form-control" disabled="@variante.Deleted"></InputNumber>
+        </div>
+        <div class="col">
+            <InputNumber @bind-Value="variante.OrixinalPrecio" class="form-control" disabled="@variante.Deleted">
+            </InputNumber>
+        </div>
+        <div class="col col-visible">
+            <InputCheckbox @bind-Value="variante.Visible" style="transform:scale(1.5,1.5);"
+                disabled="@variante.Deleted">
+            </InputCheckbox>
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-primary" disabled="@variante.Deleted"
+                @onclick="@(() => RemoveVariante(variante.ProductoTypeId))">
+                <i class="oi oi-trash"></i>
+            </button>
+        </div>
+    </div>
+        }
+        <button type="button" class="btn btn-primary" @onclick="AddVariante">
+            <i class="oi oi-plus"></i> Engadir variante de producto
+        </button>
+        <hr />
+        <div class="mb-o">
+            <label for="categoria">Categoria</label>
+            <InputSelect id="categoria" @bind-Value="producto.CategoriaId" class="form-control">
+                @foreach (var categoria in CategoriaService.AdminCategorias)
+                {
+                <option value="@categoria.Id">@categoria.Nome</option>
+                }
+        </InputSelect>
+    </div>
+    <hr />
+    <div class="form-check">
+        <InputCheckbox id="destacado" @bind-Value="producto.Destacado" class="form-check-input"></InputCheckbox>
+        <label for="destacado" class="form-check">Destacado</label>
+    </div>
+    <div class="form-check">
+        <InputCheckbox id="visible" @bind-Value="producto.Visible" class="form-check-input"></InputCheckbox>
+        <label for="visible" class="form-check-label">Visible</label>
+    </div>
+    <hr />
+    <button type="submit" class="btn btn-primary float-end">@btnText</button>
+    <ValidationSummary></ValidationSummary>
+</EditForm>
+    @if (!producto.IsNew)
+    {
+        <button type="button" class="btn btn-danger float-start" @onclick="DeleteProducto">
+            Borrar Producto
+        </button>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    Producto producto = new Producto();
+    bool cargando = true;
+    string btnText = "";
+    string msg = "Cargando...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ProductoTypeService.GetProductoTypes();
+        await CategoriaService.GetAdminCategorias();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == 0)
+        {
+            producto = new Producto { IsNew = true };
+            btnText = "Crear Producto";
+        }
+        else
+        {
+            Producto dbProducto = (await ProductoService.GetProducto(Id)).Data;
+            if (dbProducto == null)
+            {
+                msg = $"O producto con Id '{Id}' non existe.";
+                return;
+            }
+            producto = dbProducto;
+            producto.Editar = true;
+            btnText = "Actualizar producto";
+        }
+        cargando = false;
+    }
+
+    void RemoveVariante(int productoTypeId)
+    {
+        var variante = producto.Variantes.Find(v => v.ProductoTypeId == productoTypeId);
+        if (variante == null)
+        {
+            return;
+        }
+        if (variante.IsNew)
+        {
+            producto.Variantes.Remove(variante);
+        }
+        else
+        {
+            variante.Deleted = true;
+        }
+    }
+
+    void AddVariante()
+    {
+        producto.Variantes.Add(new ProductoVariante { IsNew = true, ProductoId = producto.Id });
+    }
+
+    async void AddOuUpdateProducto()
+    {
+        if (producto.IsNew)
+        {
+            var resultado = await ProductoService.CreateProducto(producto);
+            NavigationManager.NavigateTo($"admin/producto/{resultado.Id}");
+        }
+        else
+        {
+            producto.IsNew = false;
+            producto = await ProductoService.UpdateProducto(producto);
+            NavigationManager.NavigateTo($"admin/producto/{producto.Id}", true);
+        }
+    }
+
+    async void DeleteProducto()
+    {
+        bool confirmado = await JSRuntime.InvokeAsync<bool>("confirm", $"Queres borrar realmente o producto '{producto.Titulo}'?");
+        if(confirmado)
+        {
+            await ProductoService.DeleteProducto(producto);
+            NavigationManager.NavigateTo($"admin/productos");
+        }
+
+    }
+}

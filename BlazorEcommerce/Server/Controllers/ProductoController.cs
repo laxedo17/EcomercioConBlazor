@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers
@@ -20,6 +21,34 @@ namespace BlazorEcommerce.Server.Controllers
         // {
         //     _context = context;
         // }
+
+        [HttpGet("admin"), Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResposta<List<Producto>>>> GetAdminProductos()
+        {
+            var resultado = await _productoService.GetAdminProductos();
+            return Ok(resultado);
+        }
+
+        [HttpPost, Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResposta<Producto>>> CreateProducto(Producto producto)
+        {
+            var resultado = await _productoService.CreateProducto(producto);
+            return Ok(resultado);
+        }
+
+        [HttpPut, Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResposta<Producto>>> UpdateProducto(Producto producto)
+        {
+            var resultado = await _productoService.UpdateProducto(producto);
+            return Ok(resultado);
+        }
+
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ServiceResposta<bool>>> DeleteProducto(int id)
+        {
+            var resultado = await _productoService.DeleteProducto(id);
+            return Ok(resultado);
+        }
 
         /// <summary>
         /// Esta version permite ver o Schema e o modelo da nosa API en Swagger

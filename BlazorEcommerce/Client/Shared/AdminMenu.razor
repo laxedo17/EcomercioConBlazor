@@ -1,0 +1,27 @@
+﻿@inject AuthenticationStateProvider AuthStateProvider
+@using System.Security.Claims
+
+@if (autorizado)
+{
+    <a class="dropdown-item" href="admin/categorias">Categorias</a>
+    <a class="dropdown-item" href="admin/producto-types">Tipos de producto</a>
+    <a class="dropdown-item" href="admin/productos">Productos</a>
+    <hr />
+}
+
+@code {
+
+    bool autorizado = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string role = (await AuthStateProvider.GetAuthenticationStateAsync())
+        .User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+
+        if (role.Contains("Admin"))
+        {
+            autorizado = true;
+        }
+    }
+
+}

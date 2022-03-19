@@ -99,7 +99,8 @@ namespace BlazorEcommerce.Server.Services.AuthService
             List<Claim> claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                new Claim(ClaimTypes.Name, usuario.Email)
+                new Claim(ClaimTypes.Name, usuario.Email),
+                new Claim(ClaimTypes.Role, usuario.Role)
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8

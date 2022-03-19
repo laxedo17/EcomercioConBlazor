@@ -3,6 +3,7 @@
     public interface IProductoService
     {
         List<Producto> Productos { get; set; }
+        List<Producto> AdminProductos { get; set; }
         // Task GetProductos();
         Task GetProductos(string? categoriaUrl = null); //modificamos o metodo anterior e establecemos o valor a null, se non temos determinada categoria, igualmente desplegamos todos os productos da peticion de productos ao servidor
         Task<ServiceResposta<Producto>> GetProducto(int productoId);
@@ -15,6 +16,10 @@
         string LastBusquedaText { get; set; }
         Task SearchProductos(string busquedaText, int paxina);
         Task<List<string>> GetProductoSearchSuxerencias(string busquedaText);
+        Task GetAdminProductos();
+        Task<Producto> CreateProducto(Producto producto);
+        Task<Producto> UpdateProducto(Producto producto);
+        Task DeleteProducto(Producto producto);
     }
 
 }

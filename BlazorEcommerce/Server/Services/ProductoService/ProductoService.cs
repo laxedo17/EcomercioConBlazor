@@ -3,22 +3,37 @@
     public class ProductoService : IProductoService
     {
         private readonly DataContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProductoService(DataContext context)
+        public ProductoService(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ServiceResposta<Producto>> GetProductoAsync(int productoId)
         {
             var resposta = new ServiceResposta<Producto>();//inicializamos a resposta
-            //var producto = await _context.Productos.FindAsync(productoId).ConfigureAwait(false);
+                                                           //var producto = await _context.Productos.FindAsync(productoId).ConfigureAwait(false);
 
-            //cambiamos codigo anterior para engadir Include e ter as relacions compostas por mais de unha id agregadas
-            var producto = await _context.Productos
-                .Include(p => p.Variantes) //por cada producto incluimos as variantes
-                .ThenInclude(v => v.ProductoType) //por cada variante queremos tamen incluir o tipo de producto
-                .FirstOrDefaultAsync(p => p.Id == productoId);//obtemos o producto apropiado -producto unico- da base de datos
+            Producto producto = null;
+            if (_httpContextAccessor.HttpContext.User.IsInRole("Admin"))
+            {
+                producto = await _context.Productos
+                    .Include(p => p.Variantes.Where(v => !v.Deleted))
+                    .ThenInclude(v => v.ProductoType)
+                    .FirstOrDefaultAsync(p => p.Id == productoId && !p.Deleted);
+            }
+            else
+            {
+                //cambiamos codigo anterior para engadir Include e ter as relacions compostas por mais de unha id agregadas
+                //obtemos o producto apropiado -producto unico- da base de datos
+                producto = await _context.Productos
+                    .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted)) //por cada producto incluimos as variantes
+                    .ThenInclude(v => v.ProductoType) //por cada variante queremos tamen incluir o tipo de producto
+                    .FirstOrDefaultAsync(p => p.Id == productoId && !p.Deleted && p.Visible);
+            }
+
             if (producto == null)
             {
                 resposta.Exito = false;
@@ -50,7 +65,9 @@
         {
             var resposta = new ServiceResposta<List<Producto>>
             {
-                Data = await _context.Productos.Include(p => p.Variantes).ToListAsync()
+                Data = await _context.Productos
+                    .Where(p => p.Visible && !p.Deleted)
+                    .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted)).ToListAsync()
             };
 
             return resposta;
@@ -73,8 +90,8 @@
             var resposta = new ServiceResposta<List<Producto>>
             {
                 Data = await _context.Productos
-                    .Where(p => p.Categoria.Url.ToLower().Equals(categoriaUrl.ToLower()))
-                    .Include(p => p.Variantes)
+                    .Where(p => p.Categoria.Url.ToLower().Equals(categoriaUrl.ToLower()) && p.Visible && !p.Deleted)
+                    .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted))
                     .ToListAsync()
             };
 
@@ -93,7 +110,7 @@
             var productos = await _context.Productos
                             .Where(p => p.Titulo.ToLower().Contains(busquedaText.ToLower())
                             ||
-                            p.Descripcion.ToLower().Contains(busquedaText.ToLower()))
+                            p.Descripcion.ToLower().Contains(busquedaText.ToLower()) && p.Visible && !p.Deleted)
                                 .Include(p => p.Variantes)
                                 .Skip((paxina - 1) * (int)numeroResultadosPorPaxina)
                                 .Take((int)numeroResultadosPorPaxina)
@@ -131,7 +148,7 @@
             return await _context.Productos
                             .Where(p => p.Titulo.ToLower().Contains(busquedaText.ToLower())
                             ||
-                            p.Descripcion.ToLower().Contains(busquedaText.ToLower()))
+                            p.Descripcion.ToLower().Contains(busquedaText.ToLower()) && p.Visible && !p.Deleted)
                                 .Include(p => p.Variantes)
                                 .ToListAsync();
         }
@@ -192,12 +209,96 @@
             var resposta = new ServiceResposta<List<Producto>>
             {
                 Data = await _context.Productos
-                    .Where(p => p.Destacado)
-                    .Include(p => p.Variantes)
+                    .Where(p => p.Destacado && p.Visible && !p.Deleted)
+                    .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted))
                     .ToListAsync()
             };
 
             return resposta;
+        }
+
+        public async Task<ServiceResposta<List<Producto>>> GetAdminProductos()
+        {
+            var resposta = new ServiceResposta<List<Producto>>
+            {
+                Data = await _context.Productos
+                .Where(p => !p.Deleted)
+                .Include(p => p.Variantes.Where(v => !v.Deleted))
+                .ThenInclude(v => v.ProductoType)
+                .ToListAsync()
+            };
+
+            return resposta;
+        }
+
+        public async Task<ServiceResposta<Producto>> CreateProducto(Producto producto)
+        {
+            foreach (var variante in producto.Variantes)
+            {
+                variante.ProductoType = null;
+            }
+            _context.Productos.Add(producto);
+            await _context.SaveChangesAsync();
+            return new ServiceResposta<Producto> { Data = producto };
+        }
+
+        public async Task<ServiceResposta<Producto>> UpdateProducto(Producto producto)
+        {
+            var dbProducto = await _context.Productos.FindAsync(producto.Id);
+            if (dbProducto == null)
+            {
+                return new ServiceResposta<Producto>
+                {
+                    Exito = false,
+                    Mensaxe = "Producto non atopado."
+                };
+            }
+
+            dbProducto.Titulo = producto.Titulo;
+            dbProducto.Descripcion = producto.Descripcion;
+            dbProducto.ImaxeUrl = producto.ImaxeUrl;
+            dbProducto.CategoriaId = producto.CategoriaId;
+            dbProducto.Visible = producto.Visible;
+            dbProducto.Destacado = producto.Destacado;
+
+            foreach (var variante in producto.Variantes)
+            {
+                var dbVariante = await _context.ProductoVariantes
+                    .SingleOrDefaultAsync(v => v.ProductoId == variante.ProductoId &&
+                    v.ProductoTypeId == variante.ProductoTypeId);
+                if (dbVariante == null)
+                {
+                    variante.ProductoType = null;
+                    _context.ProductoVariantes.Add(variante);
+                }
+                else
+                {
+                    dbVariante.ProductoTypeId = variante.ProductoTypeId;
+                    dbVariante.Precio = variante.Precio;
+                    dbVariante.OrixinalPrecio = variante.OrixinalPrecio;
+                    dbVariante.Visible = variante.Visible;
+                    dbVariante.Deleted = variante.Deleted;
+                }
+            }
+            await _context.SaveChangesAsync();
+            return new ServiceResposta<Producto> { Data = producto };
+        }
+
+        public async Task<ServiceResposta<bool>> DeleteProducto(int productoId)
+        {
+            var dbProducto = await _context.Productos.FindAsync(productoId);
+            if (dbProducto == null)
+            {
+                return new ServiceResposta<bool>
+                {
+                    Exito = false,
+                    Data = false,
+                    Mensaxe = "Producto non atopado."
+                };
+            }
+            dbProducto.Deleted = true;
+            await _context.SaveChangesAsync();
+            return new ServiceResposta<bool> { Data = true };
         }
     }
 }

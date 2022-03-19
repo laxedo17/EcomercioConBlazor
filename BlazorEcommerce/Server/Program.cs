@@ -9,8 +9,10 @@ global using BlazorEcommerce.Server.Services.AuthService;
 global using BlazorEcommerce.Server.Services.PedidoService;
 global using BlazorEcommerce.Server.Services.PagoService;
 global using BlazorEcommerce.Server.Services.DireccionService;
+global using BlazorEcommerce.Server.Services.ProductoTypeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<IDireccionService, DireccionService>();
+builder.Services.AddScoped<IProductoTypeService, ProductoTypeService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -81,3 +84,6 @@ app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();
+
+//plataforma de pago sintaxis
+//stripe listen --forward-to https://localhost:7263/api/pago

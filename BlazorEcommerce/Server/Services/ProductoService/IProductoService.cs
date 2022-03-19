@@ -9,5 +9,9 @@
         Task<ServiceResposta<ProductoSearchResultsDto>> SearchProductos(string busquedaText, int paxina);
         Task<ServiceResposta<List<string>>> GetProductosSearchSuxerencias(string busquedaText);
         Task<ServiceResposta<List<Producto>>> GetProductosDestacados();
+        Task<ServiceResposta<List<Producto>>> GetAdminProductos();
+        Task<ServiceResposta<Producto>> CreateProducto(Producto producto);
+        Task<ServiceResposta<Producto>> UpdateProducto(Producto producto);
+        Task<ServiceResposta<bool>> DeleteProducto(int productoId);
     }
 }

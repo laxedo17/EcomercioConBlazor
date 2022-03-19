@@ -14,7 +14,39 @@
         public int PaxinaActual { get; set; } = 1;
         public int ContaPaxinas { get; set; } = 0;
         public string LastBusquedaText { get; set; } = string.Empty;
+        public List<Producto> AdminProductos { get; set; } = new List<Producto>();
+
         public event Action ProductosCambiaron;
+
+        public async Task<Producto> CreateProducto(Producto producto)
+        {
+            var resultado = await _http.PostAsJsonAsync("api/producto", producto);
+            var novoProducto = (await resultado.Content.ReadFromJsonAsync<ServiceResposta<Producto>>()).Data;
+            return novoProducto;
+        }
+
+        public async Task<Producto> UpdateProducto(Producto producto)
+        {
+            var resultado = await _http.PutAsJsonAsync($"api/producto", producto);
+            return (await resultado.Content.ReadFromJsonAsync<ServiceResposta<Producto>>()).Data;
+        }
+
+        public async Task DeleteProducto(Producto producto)
+        {
+            var resultado = await _http.DeleteAsync($"api/producto/{producto.Id}");
+        }
+
+        public async Task GetAdminProductos()
+        {
+            var resultado = await _http.GetFromJsonAsync<ServiceResposta<List<Producto>>>("api/producto/admin");
+            AdminProductos = resultado.Data;
+            PaxinaActual = 1;
+            ContaPaxinas = 0;
+            if (AdminProductos.Count == 0)
+            {
+                Mensaxe = "Non se atoparon productos";
+            }
+        }
 
         public async Task<ServiceResposta<Producto>> GetProducto(int productoId)
         {

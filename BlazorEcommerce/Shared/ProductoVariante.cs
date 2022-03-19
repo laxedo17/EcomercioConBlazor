@@ -14,15 +14,21 @@ namespace BlazorEcommerce.Shared
         //Usamos JsonIgnore para evitar referencias cruzadas, porque en cada producto con variantes do server teremos un tipo de Producto que por suposto pode ter variantes, etc etc, o cal crea referencias circulares
         //TODO: Este problema solucionase con DTOs -Data Transfer Objects-
         [JsonIgnore]
-        public Producto Producto { get; set; }
+        public Producto? Producto { get; set; }
         public int ProductoId { get; set; }
-        public ProductoType ProductoType { get; set; }
+        public ProductoType? ProductoType { get; set; }
         public int ProductoTypeId { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Precio { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal OrixinalPrecio { get; set; } //Por si usamos un desconto
-        
+        public bool Visible { get; set; } = true;
+        public bool Deleted { get; set; } = false;
+        [NotMapped]
+        public bool Editar { get; set; } = false;
+        [NotMapped]
+        public bool IsNew { get; set; } = false;
+
     }
 }
