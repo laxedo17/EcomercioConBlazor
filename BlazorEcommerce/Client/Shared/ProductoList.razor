@@ -14,7 +14,15 @@ else
             <li class="media my-3">
                 <div class="media-img-wrapper mr-2">
                     <a href="/producto/@producto.Id">
-                        <img class="media-img" src="@producto.ImaxeUrl" alt="@producto.Titulo" />
+                        @if(!string.IsNullOrEmpty(producto.ImaxeUrl))
+                        {
+                            <img class="media-img" src="@producto.ImaxeUrl" alt="@producto.Titulo" />
+                        }
+                        else if(producto.Imaxes.Count > 0)
+                        {
+                            <img class="media-img" src="@producto.Imaxes[0].Datos" alt="@producto.Titulo" />
+                        }
+                        
                     </a>
                 </div>
                 <div class="media-body">

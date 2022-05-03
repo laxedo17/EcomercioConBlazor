@@ -15,6 +15,11 @@ namespace BlazorEcommerce.Shared
         public string Titulo { get; set; } = string.Empty;
         public string Descripcion { get; set; } = string.Empty; //string.Empty para evitar mensaxe de advertencia "non-nullable property"
         public string ImaxeUrl { get; set; } = string.Empty;
+        //crea relacion de 1 a moitos para BD SQL Server con EF Core
+        //1 Producto pode ter varias imaxes
+        //que necesitaremos para facer migracion de BD e actualizala
+        public List<Imaxe> Imaxes { get; set; } = new List<Imaxe>();
+
         //[Column(TypeName = "decimal(18,2)")]
         //public decimal Precio { get; set; } 
         //Column engadido para que Entity Framework recoñeza o valor decimal e os dixitos que levara por defecto

@@ -27,12 +27,21 @@ else
             </tr>
         </thead>
         <tbody>
-            @* Usaremos o virtualize component que nos vira moi ben para aforrar memoria xa que solo carga o que realmente
+            @* Usamos o virtualize component que nos vira moi ben para aforrar memoria xa que solo carga o que realmente
                 se esta vendo no navegador. Funciona como un foreach coa variable producto neste caso
                 Se non o usamos e hai moitos productos, a paxina pode perder rendemento *@
             <Virtualize Items="ProductoService.AdminProductos" Context="producto">
                 <tr>
-                    <td><img src="@producto.ImaxeUrl" /></td>
+                <td><img src="@producto.ImaxeUrl" />
+                @if(!string.IsNullOrEmpty(producto.ImaxeUrl))
+                {
+                        <img src="@producto.ImaxeUrl" />
+                    }
+                    else if(producto.Imaxes.Count > 0)
+                    {
+                        <img src="@producto.Imaxes[0].Datos" />
+                    }
+                </td>
                     <td>@producto.Titulo</td>
                     <td>
                         @foreach (var variante in producto.Variantes)

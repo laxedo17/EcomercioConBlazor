@@ -15,8 +15,15 @@
 {
     <div class="producto-destacado">
         <div>
-            <a href="producto/@producto.Id" target="_blank">
-            <img src="@producto.ImaxeUrl" />
+            <a href="producto/@producto.Id">
+                @if(!string.IsNullOrEmpty(producto.ImaxeUrl))
+                {
+                    <img src="@producto.ImaxeUrl" />
+                }
+                else if(producto.Imaxes.Count > 0)
+                {
+                    <img src="@producto.Imaxes[0].Datos" />
+                }
             </a>
         </div>
         <h4> <a href="producto/@producto.Id">@producto.Titulo</a></h4>

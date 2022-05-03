@@ -12,6 +12,7 @@
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<PedidoProducto> PedidoProductos { get; set; }
         public DbSet<Direccion> Direccions { get; set; }
+        public DbSet<Imaxe> Imaxes { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

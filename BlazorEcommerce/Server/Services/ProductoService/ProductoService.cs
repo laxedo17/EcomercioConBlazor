@@ -14,7 +14,7 @@
         public async Task<ServiceResposta<Producto>> GetProductoAsync(int productoId)
         {
             var resposta = new ServiceResposta<Producto>();//inicializamos a resposta
-                                                           //var producto = await _context.Productos.FindAsync(productoId).ConfigureAwait(false);
+            //var producto = await _context.Productos.FindAsync(productoId).ConfigureAwait(false);
 
             Producto producto = null;
             if (_httpContextAccessor.HttpContext.User.IsInRole("Admin"))
@@ -22,6 +22,7 @@
                 producto = await _context.Productos
                     .Include(p => p.Variantes.Where(v => !v.Deleted))
                     .ThenInclude(v => v.ProductoType)
+                    .Include(p => p.Imaxes)
                     .FirstOrDefaultAsync(p => p.Id == productoId && !p.Deleted);
             }
             else
@@ -31,6 +32,7 @@
                 producto = await _context.Productos
                     .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted)) //por cada producto incluimos as variantes
                     .ThenInclude(v => v.ProductoType) //por cada variante queremos tamen incluir o tipo de producto
+                    .Include(p => p.Imaxes)
                     .FirstOrDefaultAsync(p => p.Id == productoId && !p.Deleted && p.Visible);
             }
 
@@ -67,7 +69,9 @@
             {
                 Data = await _context.Productos
                     .Where(p => p.Visible && !p.Deleted)
-                    .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted)).ToListAsync()
+                    .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted))
+                    .Include(p => p.Imaxes)
+                    .ToListAsync()
             };
 
             return resposta;
@@ -92,6 +96,7 @@
                 Data = await _context.Productos
                     .Where(p => p.Categoria.Url.ToLower().Equals(categoriaUrl.ToLower()) && p.Visible && !p.Deleted)
                     .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted))
+                    .Include(p => p.Imaxes)
                     .ToListAsync()
             };
 
@@ -112,6 +117,7 @@
                             ||
                             p.Descripcion.ToLower().Contains(busquedaText.ToLower()) && p.Visible && !p.Deleted)
                                 .Include(p => p.Variantes)
+                                .Include(p => p.Imaxes)
                                 .Skip((paxina - 1) * (int)numeroResultadosPorPaxina)
                                 .Take((int)numeroResultadosPorPaxina)
                                 .ToListAsync();
@@ -211,6 +217,7 @@
                 Data = await _context.Productos
                     .Where(p => p.Destacado && p.Visible && !p.Deleted)
                     .Include(p => p.Variantes.Where(v => v.Visible && !v.Deleted))
+                    .Include(p => p.Imaxes)
                     .ToListAsync()
             };
 
@@ -225,6 +232,7 @@
                 .Where(p => !p.Deleted)
                 .Include(p => p.Variantes.Where(v => !v.Deleted))
                 .ThenInclude(v => v.ProductoType)
+                .Include(p => p.Imaxes)
                 .ToListAsync()
             };
 
@@ -244,7 +252,10 @@
 
         public async Task<ServiceResposta<Producto>> UpdateProducto(Producto producto)
         {
-            var dbProducto = await _context.Productos.FindAsync(producto.Id);
+            var dbProducto = await _context.Productos
+                .Include(p => p.Imaxes)
+                .FirstOrDefaultAsync(p => p.Id == producto.Id);
+
             if (dbProducto == null)
             {
                 return new ServiceResposta<Producto>
@@ -260,6 +271,13 @@
             dbProducto.CategoriaId = producto.CategoriaId;
             dbProducto.Visible = producto.Visible;
             dbProducto.Destacado = producto.Destacado;
+
+            var imaxesProducto = dbProducto.Imaxes;
+            _context.Imaxes.RemoveRange(imaxesProducto);
+            //eliminamos todas as imaxes dun producto na BD
+
+            //e todas as imaxes agora incluidas co producto son as nosas imaxes de producto
+            dbProducto.Imaxes = producto.Imaxes;
 
             foreach (var variante in producto.Variantes)
             {

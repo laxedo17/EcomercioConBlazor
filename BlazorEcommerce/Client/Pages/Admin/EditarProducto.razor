@@ -30,8 +30,39 @@ else
             <label for="imaxeUrl">Imaxe Url</label>
             <InputText id="imageUrl" @bind-Value="producto.ImaxeUrl" class="form-control"></InputText>
         </div>
+        <div class="mb-0" style="display: flex; flex-wrap: wrap; flex-direction: row; justify-content: center;">
+            @if (!string.IsNullOrEmpty(producto.ImaxeUrl))
+            {
+                <img src="@producto.ImaxeUrl" />
+            }
+            else
+            {
+                foreach (var imaxe in producto.Imaxes)
+                {
+                    //o string base64
+                    @*<img src="@imaxe.Datos" />*@
+                    //importante marcar type como button porque estamos nunha EditForm e solo debe haber un boton submit
+                   @* <button type="button" @onclick="(() => EliminarImaxe(imaxe.Id))">Eliminar imaxe</button>*@
+                  @* usando MudBlazor*@
+                  <MudCard Class="ma-2">
+                    <MudCardContent>
+                        <MudImage Src="@imaxe.Datos" />
+                    </MudCardContent>
+                    <MudCardActions Style="justify-content: center;">
+                        <MudButton Variant="Variant.Filled"
+                        Color="Color.Error" 
+                        OnClick="@(() => EliminarImaxe(imaxe.Id))">
+                        Eliminar
+                        </MudButton>
+                    </MudCardActions>
+                  </MudCard>
+                }
+            }
+        </div>
         <div class="mb-0">
-            <img src="@producto.ImaxeUrl" />
+            <label for="imaxes">Imaxe(s)</label>
+            @* multiple permite a usuario seleccionar multiples arquivos *@
+            <InputFile id="imaxes" OnChange="OnFicheiroChange" multiple class="form-control"></InputFile>
         </div>
         <div class="mb-0">
             <label for="descripcion">Descripcion</label>
@@ -66,12 +97,12 @@ else
         </div>
         <div class="col col-visible">
             <InputCheckbox @bind-Value="variante.Visible" style="transform:scale(1.5,1.5);"
-                disabled="@variante.Deleted">
+                           disabled="@variante.Deleted">
             </InputCheckbox>
         </div>
         <div class="col">
             <button type="button" class="btn btn-primary" disabled="@variante.Deleted"
-                @onclick="@(() => RemoveVariante(variante.ProductoTypeId))">
+                    @onclick="@(() => RemoveVariante(variante.ProductoTypeId))">
                 <i class="oi oi-trash"></i>
             </button>
         </div>
@@ -188,11 +219,38 @@ else
     async void DeleteProducto()
     {
         bool confirmado = await JSRuntime.InvokeAsync<bool>("confirm", $"Queres borrar realmente o producto '{producto.Titulo}'?");
-        if(confirmado)
+        if (confirmado)
         {
             await ProductoService.DeleteProducto(producto);
             NavigationManager.NavigateTo($"admin/productos");
         }
+    }
 
+    async Task OnFicheiroChange(InputFileChangeEventArgs e)
+    {
+        //collemos cada arquivo co que facemos upload
+        //estos arquivos veñen con estos eventos, e facemos un loop foreach
+        //e redimensionamos as imaxes
+        var formatoImaxe = "image/png";
+        //non recomendable int.MaxValue porque usuario poderia subir millons de arquivos do tiron
+        //pero queda como exemplo do que e posible
+        foreach (var imaxe in e.GetMultipleFiles(int.MaxValue))
+        {
+            //redimension imaxenes a 200x200 pixels, en formato png
+            var imaxeRedimensionada = await imaxe.RequestImageFileAsync(formatoImaxe, 200, 200);
+            var bufferImaxe = new byte[imaxeRedimensionada.Size];
+            await imaxeRedimensionada.OpenReadStream().ReadAsync(bufferImaxe);
+            var imaxeDatos = $"data:{formatoImaxe};base64,{Convert.ToBase64String(bufferImaxe)}";
+            producto.Imaxes.Add(new Imaxe { Datos = imaxeDatos });
+        }
+    }
+
+    void EliminarImaxe(int id)
+    {
+        var imaxe = producto.Imaxes.FirstOrDefault(i => i.Id == id);
+        if (imaxe != null)
+        {
+            producto.Imaxes.Remove(imaxe);
+        }
     }
 }
