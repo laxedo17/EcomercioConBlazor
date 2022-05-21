@@ -1,4 +1,4 @@
-# EcomercioConBlazor_SQLSERVER
+# Comercio electronico con Blazor e SQLSERVER
 Proxecto full-stack con Blazor con plataforma de pago electronico e base de datos, incluída autenticación e sección de admin para agregar/quitar productos con BD SQL Server.
 
 Para usar menu de Admin e agregar datos e imaxes e categorias a base de datos, hai que rexistrarse -vale email ficticio e password super super simple-.
